@@ -21,22 +21,24 @@ class testmodelViewSet(viewsets.ModelViewSet):
 ####################################################################
 class CalculateDroughtAPIView(APIView):
     def get(self, request, format=None):    
-        #Get the User inputs:
-        cropType = "Cotton"
-        soilType = "Sandy loam"
-        initMoistCond = "Really Wet"
-        hydroSoilGrp = "D"
-        plantCond = "Poor Drainage"
+        # #Get the User inputs:
+        # cropType = "Cotton"
+        # soilType = "Sandy loam"
+        # initMoistCond = "Really Wet"
+        # hydroSoilGrp = "D"
+        # plantCond = "Poor Drainage"
 
-        plantDate = "5/11/16"
-        fieldSize = 0.26018
+        # plantDate = "5/11/16"
+        # fieldSize = 0.26018
 
-        #user override (default values are suggested)
-        seasonLength = 162
-        fieldCap = 0.46
-        permWiltPoint = 0.40
-        maxAllowDepl = ""
-        maxRootDepth = ""
+        # #user override (default values are suggested)
+        # seasonLength = 162
+        # fieldCap = 0.46
+        # permWiltPoint = 0.40
+        # maxAllowDepl = ""
+        # maxRootDepth = ""
+        
+        inputs = request.data 
 
         daps = {"Early":"", "Development":"","Mid":"",
                     "Late":"","Last Irrig. Event":""}
@@ -57,18 +59,18 @@ class CalculateDroughtAPIView(APIView):
         soil_moisture = pd.read_csv(path+"/soil_moisture.csv",index_col='Initial Conditions')
         unit_conversion = pd.read_csv(path+"/Unit_conversion.csv",index_col='Flow meter readings')
 
-        planting_date = datetime.strptime(plantDate, "%m/%d/%y")
-        if seasonLength == "":
-            seasonLength = crop_info.loc[cropType,"Length of growing period (days)"]
+        planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%y")
+        if inputs["seasonLength"] == "":
+            inputs["seasonLength"] = crop_info.loc[inputs["cropType"],"Length of growing period (days)"]
 
-        date_range = [(planting_date + timedelta(days=i)) for i in range(seasonLength)]         
-        days_after_planting = [i for i in range(0,seasonLength)]      
+        date_range = [(planting_date + timedelta(days=i)) for i in range(inputs["seasonLength"])]         
+        days_after_planting = [i for i in range(0,inputs["seasonLength"])]      
         #plant_growth_stage = []  
 
 
-        if maxRootDepth == "":
-            max_root_depth = crop_info.loc[cropType,"Maximum Root Depth (in)"]
-        dap = crop_info.loc[cropType,"DAP for Max Root Depth"]
+        if inputs["maxRootDepth"] == "":
+            max_root_depth = crop_info.loc[inputs["cropType"],"Maximum Root Depth (in)"]
+        dap = crop_info.loc[inputs["cropType"],"DAP for Max Root Depth"]
 
         root_depth = []
         for no_days in days_after_planting:
@@ -79,21 +81,21 @@ class CalculateDroughtAPIView(APIView):
             else:
                 root_depth.append(max_root_depth)
 
-        if permWiltPoint == "":
-            permWiltPoint = soil_condition.loc[soilType,"Permanent Wilting Point (in/in)"]
+        if inputs["permWiltPoint"] == "":
+            inputs["permWiltPoint"] = soil_condition.loc[inputs["soilType"],"Permanent Wilting Point (in/in)"]
 
-        if fieldCap == "":
-            fieldCap = permWiltPoint + soil_condition.loc[soilType,"Average Plant Available Water  (in/in)"]
+        if inputs["fieldCap"] == "":
+            inputs["fieldCap"]  =inputs["permWiltPoint"] + soil_condition.loc[inputs["soilType"],"Average Plant Available Water  (in/in)"]
             
-        field_capacity = [round(i*fieldCap,2) for i in root_depth]    
-        perm_wilt_point = [round(i*permWiltPoint,2) for i in root_depth]    
+        field_capacity = [round(i*inputs["fieldCap"] ,2) for i in root_depth]    
+        perm_wilt_point = [round(i*inputs["permWiltPoint"],2) for i in root_depth]    
 
-        if maxAllowDepl == "":
-            maxAllowDepl = crop_info.loc[cropType,"Maximum Allowable Depletion (%)"]
-        refill_point = [round(i-(maxAllowDepl/100)*(i-j),2) for i,j in zip(field_capacity,perm_wilt_point)]
+        if inputs["maxAllowDepl"] == "":
+            inputs["maxAllowDepl"] = crop_info.loc[inputs["cropType"],"Maximum Allowable Depletion (%)"]
+        refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j),2) for i,j in zip(field_capacity,perm_wilt_point)]
 
-        col_Kc = crop_info.loc[cropType,"Column for Kc"]
-        col_dap = crop_info.loc[cropType,"Column for DAP"]
+        col_Kc = crop_info.loc[inputs["cropType"],"Column for Kc"]
+        col_dap = crop_info.loc[inputs["cropType"],"Column for DAP"]
 
         for item in daps:
             if daps[item]=="":
@@ -119,8 +121,8 @@ class CalculateDroughtAPIView(APIView):
             else:
                 Kc.append(cropCoeff['Last Irrig. Event'])
 
-        storage = (1000/(soil_drainage_group.loc[plantCond,hydroSoilGrp])) -10
-        ratio = soil_moisture.loc[initMoistCond,"Ratio"]
+        storage = (1000/(soil_drainage_group.loc[inputs["plantCond"],inputs["hydroSoilGrp"]])) -10
+        ratio = soil_moisture.loc[inputs["initMoistCond"],"Ratio"]
         ####################################################################
         #Run the calculation
         SWLs = []    #append starting water level
@@ -196,7 +198,7 @@ class CalculateDroughtAPIView(APIView):
         gross_irrig_inch = grossIrrigation * grossIrrigFactor
 
         #########
-        swl,crop_et,eff_rainfall, sr, dp,ewl,vwc = growthDay(ET0,rain,EWLs[day-1],root_depth[day-1],root_depth[day],field_capacity[day],fieldCap,
+        swl,crop_et,eff_rainfall, sr, dp,ewl,vwc = growthDay(ET0,rain,EWLs[day-1],root_depth[day-1],root_depth[day],field_capacity[day],inputs["fieldCap"] ,
                                                                     refill_point[day],perm_wilt_point[day],Kc[day],storage,gross_irrig_inch=0) 
                                                 
         if (((swl-crop_et+eff_rainfall<refill_point[day] and day>=daps['Development'] and day<daps['Last Irrig. Event']) or
