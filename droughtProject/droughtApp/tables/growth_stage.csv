@@ -1,0 +1,6 @@
+Crop,Indicator,Emergence,Initial Moisture Check,Irrigation Initiation,Irrigation Termination
+Corn,1,VE,V10,R1,R5.5
+Soybean,2,VE,V10,R1,R6.5
+Cotton,3,VE,V10,Square,Open Boll
+Grain Sorghum,4,VE,3,4,8
+Sugarcane,5,Plant,Pre-GG,GG,Ripe

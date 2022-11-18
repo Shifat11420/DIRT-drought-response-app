@@ -1,0 +1,6 @@
+Period,Kc for Corn,DAP for Corn,Kc for Soybean,DAP for Soybean,Kc for Cotton,DAP for Cotton,Kc for Grain Sorghum,DAP for Sorghum,Kc for Sugarcane,DAP for Sugarcane
+Early,0.22,0,0.30,0,0.42,0,0.22,0,0.64,0
+Development,Linear,40,Linear,35,Linear,35,Linear,35,Linear,45
+Mid,1.27,49,1.22,61,1.44,64,1.11,49,1.25,60
+Late,Linear,71,Linear,92,Linear,94,Linear,71,Linear,120
+Last Irrig. Event,0.39,106,0.56,96,0.62,115,0.61,106,0.7,150

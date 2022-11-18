@@ -1,0 +1,9 @@
+Soil Texture,Indicator,Average Plant Available Water  (in/ft),Average Plant Available Water  (in/in),Permanent Wilting Point (in/in)
+Coarse sand and gravel,1,0.45,0.0375,0.03
+Sand,2,0.8,0.066666667,0.07
+Loamy sand,3,1.05,0.0875,0.1
+Sandy loam,4,1.55,0.129166667,0.12
+Fine sandy loam,5,1.95,0.1625,0.14
+Loam and silt loam,6,2.4,0.2,0.16
+Clay loam and silty clay loam,7,2.1,0.175,0.18
+Silty clay and clay,8,1.9,0.158333333,0.2
