@@ -1,0 +1,6 @@
+Crops,Indicator,Length of growing period (days),Maximum Root Depth (in),Maximum Allowable Depletion (%),Column for Kc,Column for DAP,DAP for Max Root Depth
+Corn,1,120,36,50,2,3,65
+Soybean,2,140,30,50,4,5,60
+Cotton,3,126,40,50,6,7,60
+Grain Sorghum,4,120,30,60,8,9,60
+Sugarcane,5,225,22,50,10,11,45
