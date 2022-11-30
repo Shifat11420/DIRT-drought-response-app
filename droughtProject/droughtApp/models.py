@@ -10,3 +10,18 @@ class testdatamodel(models.Model):
    
     def __str__(self):
         return self.name
+
+
+class cropInfo(models.Model):
+    crops = models.CharField(max_length=20)
+    indicator = models.IntegerField()
+    lengthOfGrowingPeriodDays = models.IntegerField()
+    maxRootDepthInches = models.IntegerField()
+    maxAlllowableDeplitionPercentage = models.IntegerField()
+    columnForKc = models.IntegerField()
+    columnForDAP = models.IntegerField()
+    dAPforMaxRootDepth = models.IntegerField()
+
+    def __str__(self):
+        return str(self.indicator)+" "+self.crops        
+

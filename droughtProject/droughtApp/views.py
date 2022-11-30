@@ -1,10 +1,10 @@
 #from urllib import response
 from django.shortcuts import render
 from rest_framework import viewsets
-from droughtApp.serializers import testmodelSerializer 
+from droughtApp.serializers import testmodelSerializer, cropInfoSerializer 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import testdatamodel 
+from .models import testdatamodel, cropInfo 
 # drought calculator imports
 import pandas as pd
 import numpy as np
@@ -51,7 +51,29 @@ class CalculateDroughtAPIView(APIView):
         ####################################################################
         #Calculations
         path = r"F:/drought-django-rest-api/drought-response/droughtProject/droughtApp/tables"  #path to the tables
-        crop_info = pd.read_csv(path+"/crop_info.csv",index_col='Crops')
+        #crop_info = pd.read_csv(path+"/crop_info.csv",index_col='Crops')
+        ##
+        crop_info = cropInfo.objects.all()
+        print("crop_info : \n", crop_info)
+        cropInfoSerializerClass = cropInfoSerializer
+        
+        queryCropInfo = crop_info.filter(crops=inputs["cropType"]).values()  
+        
+        for q in queryCropInfo:
+            lengthOfGrowingPeriodQUERY = q['lengthOfGrowingPeriodDays']
+            maxRootDepthQUERY = q['maxRootDepthInches']
+            maxAlllowableDeplitionQUERY = q['maxAlllowableDeplitionPercentage']
+            columnForKcQUERY = q['columnForKc']
+            columnForDAPQUERY = q['columnForDAP']
+            dAPforMaxRootDepthQUERY = q['dAPforMaxRootDepth']
+
+        print("for crops _",inputs["cropType"],"_ \n","length Of Growing Period Days = ",lengthOfGrowingPeriodQUERY,"\n", "maxRootDepthQUERY=", maxRootDepthQUERY,"\n", 
+        "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY,"\n", "columnForKcQUERY =", columnForKcQUERY ,"\n", "columnForDAPQUERY= ", columnForDAPQUERY,"\n",
+        "dAPforMaxRootDepthQUERY =",dAPforMaxRootDepthQUERY )
+        #   ### 
+        ##
+              
+
         crop_period = pd.read_csv(path+"/crop_period.csv",index_col='Period')
         growth_stage = pd.read_csv(path+"/growth_stage.csv",index_col='Crop')
         soil_condition = pd.read_csv(path+"/soil condition.csv",index_col='Soil Texture')
@@ -61,16 +83,20 @@ class CalculateDroughtAPIView(APIView):
 
         planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%y")
         if inputs["seasonLength"] == "":
-            inputs["seasonLength"] = crop_info.loc[inputs["cropType"],"Length of growing period (days)"]
-
+            #inputs["seasonLength"] = crop_info.loc[inputs["cropType"],"Length of growing period (days)"]
+            inputs["seasonLength"] = lengthOfGrowingPeriodQUERY
+               
+      
         date_range = [(planting_date + timedelta(days=i)) for i in range(inputs["seasonLength"])]         
         days_after_planting = [i for i in range(0,inputs["seasonLength"])]      
         #plant_growth_stage = []  
 
 
         if inputs["maxRootDepth"] == "":
-            max_root_depth = crop_info.loc[inputs["cropType"],"Maximum Root Depth (in)"]
-        dap = crop_info.loc[inputs["cropType"],"DAP for Max Root Depth"]
+            #max_root_depth = crop_info.loc[inputs["cropType"],"Maximum Root Depth (in)"]
+            max_root_depth = maxRootDepthQUERY
+        #dap = crop_info.loc[inputs["cropType"],"DAP for Max Root Depth"]
+        dap = dAPforMaxRootDepthQUERY
 
         root_depth = []
         for no_days in days_after_planting:
@@ -91,11 +117,15 @@ class CalculateDroughtAPIView(APIView):
         perm_wilt_point = [round(i*inputs["permWiltPoint"],2) for i in root_depth]    
 
         if inputs["maxAllowDepl"] == "":
-            inputs["maxAllowDepl"] = crop_info.loc[inputs["cropType"],"Maximum Allowable Depletion (%)"]
+            #inputs["maxAllowDepl"] = crop_info.loc[inputs["cropType"],"Maximum Allowable Depletion (%)"]
+            inputs["maxAllowDepl"] = maxAlllowableDeplitionQUERY
         refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j),2) for i,j in zip(field_capacity,perm_wilt_point)]
 
-        col_Kc = crop_info.loc[inputs["cropType"],"Column for Kc"]
-        col_dap = crop_info.loc[inputs["cropType"],"Column for DAP"]
+        # col_Kc = crop_info.loc[inputs["cropType"],"Column for Kc"]
+        # col_dap = crop_info.loc[inputs["cropType"],"Column for DAP"]
+
+        col_Kc = columnForKcQUERY
+        col_dap = columnForDAPQUERY
 
         for item in daps:
             if daps[item]=="":
