@@ -11,7 +11,13 @@ import numpy as np
 from datetime import datetime
 from datetime import timedelta
 from droughtApp.functions import *
-#
+# AERISweatherAPI
+import requests
+import json
+from jsonpath_ng import jsonpath, parse
+
+
+
 
 class testmodelViewSet(viewsets.ModelViewSet): 
     queryset = testdatamodel.objects.all().order_by('id') 
@@ -28,7 +34,7 @@ class CalculateDroughtAPIView(APIView):
         # hydroSoilGrp = "D"
         # plantCond = "Poor Drainage"
 
-        # plantDate = "5/11/16"
+        # plantDate = "01/11/2023"
         # fieldSize = 0.26018
 
         # #user override (default values are suggested)
@@ -47,14 +53,31 @@ class CalculateDroughtAPIView(APIView):
 
 
         ####################################################################
+        # API requests
+        api_url = "http://api.aerisapi.com/conditions/70803?client_id=22jRBqhgG631jx2a4x7Io&client_secret=luddtwCbijC5wy6Y1W3IkuFnzqLqQlprinobETxW&from=01/07/2023&to=01/12/2023&filter=24hr"
+        response = requests.get(api_url)
+        print("API output------------")
+        #print(response.json())
+        
+        
+        json_data = response.json() if response and response.status_code == 200 else None
+        dictRainfall = {}
+        if json_data and 'response' in json_data:
+            if 'periods' in json_data['response'][0]: 
+                i = 0
+                for eachPeriod in json_data['response'][0]['periods']:              
+                    rainfromAPI = eachPeriod.get('precipIN')
+                    #print("for day ", i , " rainFall is ",rainfromAPI)
+                    dictRainfall["rainDay{0}".format(i)] = rainfromAPI
+                    i += 1
+                print("dictRainfall =", dictRainfall)
+
 
         ####################################################################
         #Calculations
-        #path = r"F:/drought-django-rest-api/drought-response/droughtProject/droughtApp/tables"  #path to the tables
-        
+
 
         ##____________________CORP INFO____________________
-        #crop_info = pd.read_csv(path+"/crop_info.csv",index_col='Crops')
         crop_info = cropInfo.objects.all()
         print("crop_info : \n", crop_info)
         cropInfoSerializerClass = cropInfoSerializer
@@ -76,21 +99,18 @@ class CalculateDroughtAPIView(APIView):
         ##
               
         ##____________________CORP PERIOD____________________
-        # crop_period = pd.read_csv(path+"/crop_period.csv",index_col='Period')
         crop_period = cropPeriod.objects.all()
         print("crop_period : \n", crop_period)
         cropPeriodSerializerClass = cropPeriodSerializer
 
         ##
         ##____________________GROWTH STAGE____________________
-        #growth_stage = pd.read_csv(path+"/growth_stage.csv",index_col='Crop')
         growth_stage = growthStage.objects.all()
         print("growth_stage : \n", growth_stage)
         growthStageSerializerClass = growthStageSerializer
 
         ##
         ##____________________SOIL CONDITION____________________
-        #soil_condition = pd.read_csv(path+"/soil condition.csv",index_col='Soil Texture')
         soil_condition = soilCondition.objects.all()
         print("soil_condition : \n", soil_condition)
         soilConditionSerializerClass = soilConditionSerializer
@@ -108,7 +128,6 @@ class CalculateDroughtAPIView(APIView):
         ##
 
         ##____________________SOIL DRAINAGE GROUP____________________
-        #soil_drainage_group = pd.read_csv(path+"/soil_drainage_group.csv",index_col='Description for CN')
         soil_drainage_group  = soilDrainageGroup.objects.all()
         print("soil_drainage_group  : \n", soil_drainage_group )
         soilDrainageGroupSerializerClass = soilDrainageGroupSerializer
@@ -131,7 +150,6 @@ class CalculateDroughtAPIView(APIView):
             hydroSoilvalueQUERY =dQUERY     
           
         ##____________________SOIL MOISTURE____________________
-        #soil_moisture = pd.read_csv(path+"/soil_moisture.csv",index_col='Initial Conditions')
         soil_moisture  = soilMoisture.objects.all()
         print("soil_moisture  : \n", soil_moisture )
         soilMoistureSerializerClass = soilMoistureSerializer
@@ -142,7 +160,6 @@ class CalculateDroughtAPIView(APIView):
           
         
         ##____________________UNIT CONVERSION____________________
-        #unit_conversion = pd.read_csv(path+"/Unit_conversion.csv",index_col='Flow meter readings')
         unit_conversion  = unitConversion.objects.all()
         print("unit_conversion  : \n", unit_conversion )
         unitConversionSerializerClass = unitConversionSerializer
@@ -151,7 +168,6 @@ class CalculateDroughtAPIView(APIView):
 
         planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%y")
         if inputs["seasonLength"] == "":
-            #inputs["seasonLength"] = crop_info.loc[inputs["cropType"],"Length of growing period (days)"]
             inputs["seasonLength"] = lengthOfGrowingPeriodQUERY
                
       
@@ -161,9 +177,7 @@ class CalculateDroughtAPIView(APIView):
 
 
         if inputs["maxRootDepth"] == "":
-            #max_root_depth = crop_info.loc[inputs["cropType"],"Maximum Root Depth (in)"]
             max_root_depth = maxRootDepthQUERY
-        #dap = crop_info.loc[inputs["cropType"],"DAP for Max Root Depth"]
         dap = dAPforMaxRootDepthQUERY
 
         root_depth = []
@@ -176,12 +190,10 @@ class CalculateDroughtAPIView(APIView):
                 root_depth.append(max_root_depth)
 
         if inputs["permWiltPoint"] == "":
-            #inputs["permWiltPoint"] = soil_condition.loc[inputs["soilType"],"Permanent Wilting Point (in/in)"]
             inputs["permWiltPoint"] = permanentWiltingPointInInQUERY
             print("inputs[permWiltPoint]",inputs["permWiltPoint"])
 
         if inputs["fieldCap"] == "":
-            #inputs["fieldCap"]  =inputs["permWiltPoint"] + soil_condition.loc[inputs["soilType"],"Average Plant Available Water  (in/in)"]
             inputs["fieldCap"]  = inputs["permWiltPoint"] + averagePlantAvailableWaterInInQUERY
             print("inputs[fieldCap]",inputs["fieldCap"])
             
@@ -189,16 +201,8 @@ class CalculateDroughtAPIView(APIView):
         perm_wilt_point = [round(i*inputs["permWiltPoint"],2) for i in root_depth]    
 
         if inputs["maxAllowDepl"] == "":
-            #inputs["maxAllowDepl"] = crop_info.loc[inputs["cropType"],"Maximum Allowable Depletion (%)"]
             inputs["maxAllowDepl"] = maxAlllowableDeplitionQUERY
         refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j),2) for i,j in zip(field_capacity,perm_wilt_point)]
-
-        # col_Kc = crop_info.loc[inputs["cropType"],"Column for Kc"]
-        # col_dap = crop_info.loc[inputs["cropType"],"Column for DAP"]
-
-        # col_Kc = columnForKcQUERY
-        # col_dap = columnForDAPQUERY
-        # print("col_Kc = ", col_Kc, "col_dap = ", col_dap)
 
         #
         if inputs["cropType"]=="Corn":
@@ -220,15 +224,11 @@ class CalculateDroughtAPIView(APIView):
 
         for item in daps:
             if daps[item]=="":
-                # daps[item] = crop_period.loc[item,crop_period.columns[col_dap-2]]
-                # print("daps----",daps[item])
                 daps[item] = list(cropPeriod.objects.all().filter(period__icontains=item).values(dap))[0][dap]
         print("daps----",daps)
 
         for item in cropCoeff:
             if cropCoeff[item]=="":
-                # cropCoeff[item] = float(crop_period.loc[item,crop_period.columns[col_Kc-2]])
-                # print("cropcoeff----", cropCoeff[item])  
                 cropCoeff[item] = float(list(cropPeriod.objects.all().filter(period__icontains=item).values(dap))[0][kc])
         print("cropcoeff----", cropCoeff)    
 
@@ -248,11 +248,9 @@ class CalculateDroughtAPIView(APIView):
             else:
                 Kc.append(cropCoeff['Last Irrig. Event'])
 
-        #storage = (1000/(soil_drainage_group.loc[inputs["plantCond"],inputs["hydroSoilGrp"]])) -10
         storage = (1000/hydroSoilvalueQUERY) -10
         print("inputs[plantCond] = ", inputs["plantCond"], "inputs[hydroSoilGrp] = ", inputs["hydroSoilGrp"], "storage =", storage)
         
-        #ratio = soil_moisture.loc[inputs["initMoistCond"],"Ratio"]
         ratio = ratioQUERY
         print("ratio =", ratio)
         
@@ -273,7 +271,8 @@ class CalculateDroughtAPIView(APIView):
 
         day = 0
 
-        rain = 0.01 #API
+        rain = dictRainfall['rainDay0']         #0.01 #API
+        print("Rain on planting day = ", rain)
 
 
         #julian day
@@ -288,7 +287,6 @@ class CalculateDroughtAPIView(APIView):
         grossIrrigation = 0                #farmer override
         grossIrrigUnit = "Acre-inch"       #dropdown if farmer provides a value in grossIrrigation
         
-        #grossIrrigFactor = unit_conversion.loc[grossIrrigUnit,"Conversion"]
         unitConversionInfo = unit_conversion.filter(flowMeterReadings=grossIrrigUnit).values()
         for q in unitConversionInfo:
             conversionQUERY = q['conversion']
@@ -329,7 +327,9 @@ class CalculateDroughtAPIView(APIView):
         #######
         #increase day incrementally
         day= 1
-        rain = 0        #API
+        #rain = 0        #API
+        rain = dictRainfall['rainDay1']         #0.01 #API
+        print("Rain on day 1 = ", rain)
 
         #ET
         J = J0+day
@@ -342,7 +342,7 @@ class CalculateDroughtAPIView(APIView):
         grossIrrigation = 0              #farmer override
         grossIrrigUnit = "Acre-inch"     #dropdown if farmer provides a value in grossIrrigation
         
-        #grossIrrigFactor = unit_conversion.loc[grossIrrigUnit,"Conversion"]
+       
         unitConversionInfo = unit_conversion.filter(flowMeterReadings=grossIrrigUnit).values()
         for q in unitConversionInfo:
             conversionQUERY = q['conversion']
