@@ -8,13 +8,14 @@ from .models import testdatamodel, cropInfo, cropPeriod, growthStage, soilMoistu
 # drought calculator imports
 import pandas as pd
 import numpy as np
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from droughtApp.functions import *
+from droughtApp.functionAPI import *
 # AERISweatherAPI
 import requests
 import json
 from jsonpath_ng import jsonpath, parse
+
 
 
 
@@ -34,7 +35,7 @@ class CalculateDroughtAPIView(APIView):
         # hydroSoilGrp = "D"
         # plantCond = "Poor Drainage"
 
-        # plantDate = "01/11/2023"
+        # plantDate = "01/15/2023"
         # fieldSize = 0.26018
 
         # #user override (default values are suggested)
@@ -51,32 +52,21 @@ class CalculateDroughtAPIView(APIView):
         cropCoeff = {"Early":0.34257447, "Mid":1.09349127,
                     "Last Irrig. Event": 0.89713052}
 
-
-        ####################################################################
-        # API requests
-        api_url = "http://api.aerisapi.com/conditions/70803?client_id=22jRBqhgG631jx2a4x7Io&client_secret=luddtwCbijC5wy6Y1W3IkuFnzqLqQlprinobETxW&from=01/07/2023&to=01/12/2023&filter=24hr"
-        response = requests.get(api_url)
-        print("API output------------")
-        #print(response.json())
         
-        
-        json_data = response.json() if response and response.status_code == 200 else None
-        dictRainfall = {}
-        if json_data and 'response' in json_data:
-            if 'periods' in json_data['response'][0]: 
-                i = 0
-                for eachPeriod in json_data['response'][0]['periods']:              
-                    rainfromAPI = eachPeriod.get('precipIN')
-                    #print("for day ", i , " rainFall is ",rainfromAPI)
-                    dictRainfall["rainDay{0}".format(i)] = rainfromAPI
-                    i += 1
-                print("dictRainfall =", dictRainfall)
-
-
         ####################################################################
+        ## For planting day
+        print("\n\n")
+        print("inputs[plantDate] = ", inputs["plantDate"])
+        plantingDate = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
+        print("plantingDate = ", plantingDate)
+           
+        ## API request 
+        rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(plantingDate)
+        #print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+        #########################################################
+
+
         #Calculations
-
-
         ##____________________CORP INFO____________________
         crop_info = cropInfo.objects.all()
         print("crop_info : \n", crop_info)
@@ -166,7 +156,10 @@ class CalculateDroughtAPIView(APIView):
 
 
 
-        planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%y")
+        planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
+        # print("inputs[plantDate] = ", inputs["plantDate"])
+        # print("type inputs[plantDate] = ", type(inputs["plantDate"]))
+        # print("planting_date = ", planting_date)
         if inputs["seasonLength"] == "":
             inputs["seasonLength"] = lengthOfGrowingPeriodQUERY
                
@@ -271,7 +264,7 @@ class CalculateDroughtAPIView(APIView):
 
         day = 0
 
-        rain = dictRainfall['rainDay0']         #0.01 #API
+        rain = rainfall_totalIN            #dictRainfall['rainDay0']         #0.01 #API
         print("Rain on planting day = ", rain)
 
 
@@ -280,8 +273,12 @@ class CalculateDroughtAPIView(APIView):
         tt = planting_date.timetuple()
         J0 = tt.tm_yday
         print("J0 = ", J0)
+        
         #all other values will come from API
-        ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
+        #ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
+
+        ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF, maxHumidity, minHumidity, solradWM2, windSpeedMPH,J0)
+        #penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,wind_speed,J,wind_z=10,Gsc=0.0820,alpha=0.23,G=0):
 
         #if farmer provides irrigation value for a day
         grossIrrigation = 0                #farmer override
@@ -325,16 +322,29 @@ class CalculateDroughtAPIView(APIView):
         irrigEffic.append(irrigation_eff)
 
         #######
+
+        
+        ## For next day to the planting day
+        print("\n\n")
+        NextDayDate = plantingDate+ timedelta(days=1)  
+        #NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
+        print("NextDay Date : ", NextDayDate)
+
+        ## API request 
+        rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(NextDayDate)
+        #print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+        ####################################################################
+
         #increase day incrementally
         day= 1
-        #rain = 0        #API
-        rain = dictRainfall['rainDay1']         #0.01 #API
+        rain = rainfall_totalIN        #API
         print("Rain on day 1 = ", rain)
 
         #ET
         J = J0+day
         #all other values will come from API
-        ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
+        ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF, maxHumidity, minHumidity, solradWM2, windSpeedMPH,J)
+        # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
         print("ET0 : ", ET0)
 
 
