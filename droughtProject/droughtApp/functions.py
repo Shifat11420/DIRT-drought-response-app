@@ -3,16 +3,16 @@ import numpy as np
 # Penman-Monteith function
 def penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,wind_speed,J,wind_z=10,Gsc=0.0820,alpha=0.23,G=0):
     """
-    station_lat = Latitude of the station (degrees)
-    station_z = altitude of the station (meters)
+    station_lat = Latitude of the station (degrees)  ##https://api.aerisapi.com/normals/stations?client_id={{clientID}}&client_secret={{clientSecret}}&p=70803 loc.lat
+    station_z = altitude of the station (meters)     ##https://www.aerisweather.com/support/docs/api/reference/endpoints/normals-stations/. profile.elevFT 
     Tmax_F = maximum temperature in F
-    Tmax_F = minimum temperature in F
+    Tmin_F = minimum temperature in F
     Rhmax = maximum relative humidity (%)
     Rhmin = minimum relative humidity (%)
-    avg_RS = average radiation in W/m2
+    avg_RS = average radiation in W/m2    #solrad 
     wind_speed = average wind speed in mph
-    J =Julian day (day number from 1 to 366)
-    wind_z = height at which the wind speed is estimated (default:10m)
+    J =Julian day (day number from 1 to 366)  ## not from API
+    wind_z = height at which the wind speed is estimated (default:10m)  ## check if we need it from API
     
     Gsc = solar constant (MJ m-2 min-1)
     alpha = Albedo (For the green grass reference crop, alpha is assumed to have a value of 0.23)
