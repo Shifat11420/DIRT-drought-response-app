@@ -259,6 +259,17 @@ class CalculateDroughtAPIView(APIView):
         VWCs = []               #append volumetric water content
         effIrrig = []           #append effective irrigation
         irrigEffic = []         #append irrigation efficiency
+        forDate = []
+        FC = []
+        MADg = []
+        waterDeficit = []
+        pwp =[]
+        grossIrrg = []
+        rainFall = []
+
+        
+       
+
         #######
         #at planting date, day = 0
 
@@ -294,7 +305,11 @@ class CalculateDroughtAPIView(APIView):
         gross_irrig_inch = grossIrrigation * grossIrrigFactor
 
  
+        FC_plantday = field_capacity[day]
+        MADforgraph = maxAlllowableDeplitionQUERY * FC_plantday
+        pwp_plantday = perm_wilt_point[day]
         
+
 
         ##############
         swl,crop_et,eff_rainfall, sr, dp,ewl,vwc = plantingDay(ET0,rain,field_capacity[day],ratio,perm_wilt_point[day],
@@ -313,6 +328,8 @@ class CalculateDroughtAPIView(APIView):
         else:
             irrigation_eff = "nan"#np.nan
         ##############
+        water_Deficit = 100* (FC_plantday-ewl)/FC_plantday
+
         SWLs.append(swl)
         EWLs.append(ewl)
         DPs.append(dp)
@@ -320,13 +337,21 @@ class CalculateDroughtAPIView(APIView):
         VWCs.append(vwc)
         effIrrig.append(eff_irrigation)
         irrigEffic.append(irrigation_eff)
+        forDate.append(plantingDate.strftime('%m/%d/%Y'))
+        FC.append(FC_plantday)
+        MADg.append(MADforgraph)
+        waterDeficit.append(water_Deficit)
+        pwp.append(pwp_plantday)
+        grossIrrg.append(grossIrrigation)
+        rainFall.append(rainfall_totalIN)
+
 
         #######
 
         
         ## For next day to the planting day
         print("\n\n")
-        NextDayDate = plantingDate+ timedelta(days=1)  
+        NextDayDate = plantingDate+ timedelta(days=9)  
         #NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
         print("NextDay Date : ", NextDayDate)
 
@@ -361,6 +386,9 @@ class CalculateDroughtAPIView(APIView):
 
 
         gross_irrig_inch = grossIrrigation * grossIrrigFactor
+        FC_growthday = field_capacity[day]
+        MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
+        pwp_growthday = perm_wilt_point[day]
 
         #########
         swl,crop_et,eff_rainfall, sr, dp,ewl,vwc = growthDay(ET0,rain,EWLs[day-1],root_depth[day-1],root_depth[day],field_capacity[day],inputs["fieldCap"] ,
@@ -380,6 +408,8 @@ class CalculateDroughtAPIView(APIView):
             irrigation_eff = "nan"     #np.nan
         ###############  
 
+        water_Deficit = 100* (FC_growthday-ewl)/FC_growthday
+
         SWLs.append(swl)
         EWLs.append(ewl)
         DPs.append(dp)
@@ -387,6 +417,14 @@ class CalculateDroughtAPIView(APIView):
         VWCs.append(vwc)
         effIrrig.append(eff_irrigation)
         irrigEffic.append(irrigation_eff)
+        forDate.append(NextDayDate.strftime('%m/%d/%Y'))
+        FC.append(FC_growthday)
+        MADg.append(MADforgraph)
+        waterDeficit.append(water_Deficit)
+        pwp.append(pwp_growthday)
+        grossIrrg.append(grossIrrigation)
+        rainFall.append(rainfall_totalIN)
+
 
 
 
@@ -445,6 +483,13 @@ class CalculateDroughtAPIView(APIView):
         print("VWCs : ", VWCs)
         print("effIrrig : ", effIrrig)
         print("irrigEffic : ", irrigEffic)
+        print("forDate : ", forDate)
+        print("field capacity : ", FC)
+        print("MADg : " , MADg)
+        print("waterDeficit(%) :", waterDeficit)
+        print("pwp : ", pwp)
+        print(" gross irrigation : ", grossIrrg)
+        print("rain fall in inches : ", rainFall)
 
-        results = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic}
+        results = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate, "MAD" : MADg, "FC" : FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity" : grossIrrg, "rain observed": rainFall  }
         return Response({'results': results})
