@@ -3,11 +3,12 @@ from django.db import models
 
 # Create your models here.
 
+
 class testdatamodel(models.Model):
     name = models.CharField(max_length=60)
     alias = models.CharField(max_length=60)
     date = models.DateField(default=datetime.date.today)
-   
+
     def __str__(self):
         return self.name
 
@@ -23,7 +24,8 @@ class cropInfo(models.Model):
     dAPforMaxRootDepth = models.IntegerField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.crops        
+        return str(self.indicator)+" "+self.crops
+
 
 class cropPeriod(models.Model):
     period = models.CharField(max_length=30)
@@ -37,9 +39,10 @@ class cropPeriod(models.Model):
     dAPforSorghum = models.IntegerField()
     kcforSugarcane = models.CharField(max_length=30)
     dAPforSugarcane = models.IntegerField()
-    
+
     def __str__(self):
-        return str(self.period)        
+        return str(self.period)
+
 
 class growthStage(models.Model):
     crop = models.CharField(max_length=20)
@@ -50,7 +53,7 @@ class growthStage(models.Model):
     irrigationTermination = models.CharField(max_length=30)
 
     def __str__(self):
-        return str(self.indicator)+" "+self.crop   
+        return str(self.indicator)+" "+self.crop
 
 
 class soilCondition(models.Model):
@@ -61,8 +64,7 @@ class soilCondition(models.Model):
     permanentWiltingPointInIn = models.FloatField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.soilTexture     
-
+        return str(self.indicator)+" "+self.soilTexture
 
 
 class soilDrainageGroup(models.Model):
@@ -74,7 +76,7 @@ class soilDrainageGroup(models.Model):
     d = models.IntegerField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.descriptionForCN         
+        return str(self.indicator)+" "+self.descriptionForCN
 
 
 class soilMoisture(models.Model):
@@ -83,7 +85,8 @@ class soilMoisture(models.Model):
     ratio = models.FloatField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.initialConditions   
+        return str(self.indicator)+" "+self.initialConditions
+
 
 class unitConversion(models.Model):
     flowMeterReadings = models.CharField(max_length=30)
@@ -92,4 +95,16 @@ class unitConversion(models.Model):
     conversion = models.FloatField()
 
     def __str__(self):
-        return self.flowMeterReadings    
+        return self.flowMeterReadings
+
+
+class userField(models.Model):
+    fieldId = models.IntegerField()
+    name = models.CharField(max_length=50)
+    location = models.CharField(max_length=100)
+    size = models.FloatField()
+    plantDate = models.DateField()
+    cropType = models.ForeignKey(cropInfo, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name
