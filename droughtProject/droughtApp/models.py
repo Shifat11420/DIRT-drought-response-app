@@ -67,13 +67,21 @@ class soilCondition(models.Model):
         return str(self.indicator)+" "+self.soilTexture
 
 
+class hydrologicGroup(models.Model):
+    indicator = models.IntegerField()
+    name = models.CharField(max_length=5)
+
+    def __str__(self):
+        return str(self.indicator)+" "+str(self.name)
+
+
 class soilDrainageGroup(models.Model):
     descriptionForCN = models.CharField(max_length=30)
     indicator = models.IntegerField()
-    a = models.IntegerField()
-    b = models.IntegerField()
-    c = models.IntegerField()
-    d = models.IntegerField()
+    A = models.IntegerField()
+    B = models.IntegerField()
+    C = models.IntegerField()
+    D = models.IntegerField()
 
     def __str__(self):
         return str(self.indicator)+" "+self.descriptionForCN
