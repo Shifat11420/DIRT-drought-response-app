@@ -1,44 +1,56 @@
 from rest_framework import serializers
-from .models import testdatamodel, cropInfo, cropPeriod, growthStage,soilMoisture, soilCondition, soilDrainageGroup, unitConversion 
-
-class testmodelSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
-        model = testdatamodel 
-        fields = ('id', 'name', 'alias', 'date')   
+from .models import testdatamodel, cropInfo, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
 
 
-class cropInfoSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+class testmodelSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = testdatamodel
+        fields = ('id', 'name', 'alias', 'date')
+
+
+class cropInfoSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = cropInfo
         fields = '__all__'
 
 
-class cropPeriodSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+class cropInfo2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = cropInfo
+        fields = '__all__'
+
+
+class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = cropPeriod
         fields = '__all__'
 
-class growthStageSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+
+class growthStageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = growthStage
         fields = '__all__'
 
-class soilMoistureSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+
+class soilMoistureSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = soilMoisture
         fields = '__all__'
 
-class soilConditionSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+
+class soilConditionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = soilCondition
         fields = '__all__'
 
-class soilDrainageGroupSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+
+class soilDrainageGroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = soilDrainageGroup
         fields = '__all__'
 
-class unitConversionSerializer(serializers.HyperlinkedModelSerializer): 
-    class Meta: 
+
+class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
         model = unitConversion
-        fields = '__all__'                                        
+        fields = '__all__'

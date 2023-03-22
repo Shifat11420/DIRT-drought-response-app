@@ -1,4 +1,12 @@
 # from urllib import response
+#from urllib import response
+from django.shortcuts import render
+from rest_framework import viewsets
+from droughtApp.serializers import testmodelSerializer, cropInfoSerializer, cropInfo2Serializer, cropPeriodSerializer, growthStageSerializer, soilConditionSerializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from .models import testdatamodel, cropInfo, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
 # drought calculator imports
 from datetime import datetime, timedelta
 
@@ -26,6 +34,26 @@ from .models import (cropInfo, cropPeriod, growthStage, soilCondition,
 class testmodelViewSet(viewsets.ModelViewSet):
     queryset = testdatamodel.objects.all().order_by('id')
     serializer_class = testmodelSerializer
+
+
+# crop types
+class CropTypes(viewsets.ModelViewSet):
+    queryset = cropInfo.objects.all().order_by('crops')
+    serializer_class = cropInfoSerializer
+
+
+class CropTypes2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = cropInfo2Serializer(
+            # cropInfo.objects.all(), many=True, context={'request': request})
+            cropInfo.objects.all(), many=True)
+
+        # Easy pattern for returning a single field
+        # croptypes = [crop.crops for crop in cropInfo.objects.all()]
+
+        return Response(serializer.data)
 
 # drought calculator
 ####################################################################
@@ -63,11 +91,11 @@ class CalculateDroughtAPIView(APIView):
         print("inputs[plantDate] = ", inputs["plantDate"])
         plantingDate = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         print("plantingDate = ", plantingDate)
-
+        print(cropInfo.objects.all())
         # API request
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
             plantingDate)
-        # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+        #print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
         #########################################################
 
         # Calculations
@@ -170,7 +198,7 @@ class CalculateDroughtAPIView(APIView):
         date_range = [(planting_date + timedelta(days=i))
                       for i in range(inputs["seasonLength"])]
         days_after_planting = [i for i in range(0, inputs["seasonLength"])]
-        # plant_growth_stage = []
+        #plant_growth_stage = []
 
         if inputs["maxRootDepth"] == "":
             max_root_depth = maxRootDepthQUERY
@@ -286,13 +314,13 @@ class CalculateDroughtAPIView(APIView):
         print("Rain on planting day = ", rain)
 
         # julian day
-        # J0 = int(format(planting_date, '%j'))
+        #J0 = int(format(planting_date, '%j'))
         tt = planting_date.timetuple()
         J0 = tt.tm_yday
         print("J0 = ", J0)
 
         # all other values will come from API
-        # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
+        #ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
 
         ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
                               maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
@@ -353,14 +381,14 @@ class CalculateDroughtAPIView(APIView):
 
         # For next day to the planting day
         print("\n\n")
-        NextDayDate = plantingDate + timedelta(days=9)
-        # NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
+        NextDayDate = plantingDate + timedelta(days=1)
+        #NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
         print("NextDay Date : ", NextDayDate)
 
         # API request
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
             NextDayDate)
-        # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+        #print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
         ####################################################################
 
         # increase day incrementally
