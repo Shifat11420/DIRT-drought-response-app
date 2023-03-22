@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from droughtApp.serializers import testmodelSerializer, cropInfoSerializer, cropInfo2Serializer, cropPeriodSerializer, growthStageSerializer, soilConditionSerializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from .models import testdatamodel, cropInfo, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
 # drought calculator imports
 import pandas as pd
@@ -24,18 +25,22 @@ class testmodelViewSet(viewsets.ModelViewSet):
 
 # crop types
 class CropTypes(viewsets.ModelViewSet):
-    queryset = cropInfo.objects.all().order_by('indicator')
+    queryset = cropInfo.objects.all().order_by('crops')
     serializer_class = cropInfoSerializer
 
 
 class CropTypes2(APIView):
     def get(self, request, format=None):
 
-        serializer = cropInfo2Serializer(cropInfo.objects.all(), many=True)
-        print(serializer)
-        print(serializer.data)
+        # serialize data
+        serializer = cropInfo2Serializer(
+            # cropInfo.objects.all(), many=True, context={'request': request})
+            cropInfo.objects.all(), many=True)
 
-        return Response({'results': serializer.data})
+        # Easy pattern for returning a single field
+        # croptypes = [crop.crops for crop in cropInfo.objects.all()]
+
+        return Response(serializer.data)
 
 # drought calculator
 ####################################################################

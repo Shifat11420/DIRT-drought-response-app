@@ -14,7 +14,7 @@ class cropInfoSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class cropInfo2Serializer(serializers.Serializer):
+class cropInfo2Serializer(serializers.ModelSerializer):
     class Meta:
         model = cropInfo
         fields = '__all__'
