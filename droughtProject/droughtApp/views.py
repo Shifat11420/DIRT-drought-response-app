@@ -6,9 +6,9 @@ from rest_framework.renderers import JSONRenderer
 from .models import testdatamodel, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
 from droughtApp.serializers import testmodelSerializer,  cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
 
-from .models import cropType, soilType  # , field, irrigation, user
-# , fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer, userSerializer, user2Serializer
-from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer
+from .models import cropType, soilType, user  # , field, irrigation
+# , fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer
+from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer
 
 # drought calculator imports
 from datetime import datetime, timedelta
@@ -103,17 +103,17 @@ class hydrologicGroups2(APIView):
 #             field.objects.all(), many=True)
 
 
-# class user(viewsets.ModelViewSet):
-#     queryset = user.objects.all().order_by('Id')
-#     serializer_class = userSerializer
+class user(viewsets.ModelViewSet):
+    queryset = user.objects.all().order_by('Id')
+    serializer_class = userSerializer
 
 
-# class user2(APIView):
-#     def get(self, request, format=None):
+class user2(APIView):
+    def get(self, request, format=None):
 
-#         # serialize data
-#         serializer = user2Serializer(
-#             user.objects.all(), many=True)
+        # serialize data
+        serializer = user2Serializer(
+            user.objects.all(), many=True)
 
 # drought calculator
 ####################################################################

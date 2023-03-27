@@ -129,15 +129,15 @@ class soilType(models.Model):
         return str(self.Id)+" "+self.Name
 
 
-# class user(models.Model):
-#     Id = models.IntegerField(primary_key=True, null=False)
-#     FirstName = models.CharField(max_length=20)
-#     LastName = models.CharField(max_length=20)
-#     Email = models.EmailField()
-#     AuthenticationInfo = models.CharField(max_length=50)
+class user(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    FirstName = models.CharField(max_length=20)
+    LastName = models.CharField(max_length=20)
+    Email = models.EmailField()
+    AuthenticationInfo = models.CharField(max_length=50)
 
-#     def __str__(self):
-#         return str(self.Id)+" "+self.FirstName+" "+self.LastName
+    def __str__(self):
+        return str(self.Id)+" "+self.FirstName+" "+self.LastName
 
 
 # class field(models.Model):
