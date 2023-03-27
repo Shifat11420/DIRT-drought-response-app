@@ -44,22 +44,6 @@ class CropTypes2(APIView):
 
 
 # soil types
-
-
-# class SoilTypes(viewsets.ModelViewSet):
-#     queryset = soilCondition.objects.all().order_by('soilTexture')
-#     serializer_class = soilCondition2Serializer
-
-
-# class SoilTypes2(APIView):
-#     def get(self, request, format=None):
-
-#         # serialize data
-#         serializer = soilCondition2Serializer(
-#             soilCondition.objects.all(), many=True)
-
-#         return Response(serializer.data)
-
 class SoilTypes(viewsets.ModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
     serializer_class = soilType2Serializer
@@ -74,18 +58,6 @@ class SoilTypes2(APIView):
 
         return Response(serializer.data)
 
-
-# class soilType(viewsets.ModelViewSet):
-#     queryset = soilType.objects.all().order_by('Id')
-#     serializer_class = soilTypeSerializer
-
-
-# class soilType2(APIView):
-#     def get(self, request, format=None):
-
-#         # serialize data
-#         serializer = soilType2Serializer(
-#             soilType.objects.all(), many=True)
 
 # hydrologic groups
 class hydrologicGroups(viewsets.ModelViewSet):

@@ -21,9 +21,6 @@ class cropTypes2Serializer(serializers.ModelSerializer):
         model = cropType
         fields = '__all__'
 
-# #
-
-
 class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = cropPeriod
