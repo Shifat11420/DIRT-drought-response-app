@@ -6,8 +6,8 @@ from rest_framework.renderers import JSONRenderer
 from .models import testdatamodel, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
 from droughtApp.serializers import testmodelSerializer,  cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
 
-from .models import cropType, soilType  # , field, irrigation, user, cropInfo,
-# , fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer, userSerializer, user2Serializer , cropInfoSerializer, cropInfo2Serializer,
+from .models import cropType, soilType  # , field, irrigation, user
+# , fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer, userSerializer, user2Serializer
 from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer
 
 # drought calculator imports
@@ -24,26 +24,6 @@ class testmodelViewSet(viewsets.ModelViewSet):
     serializer_class = testmodelSerializer
 
 
-# crop types
-# class CropTypes(viewsets.ModelViewSet):
-#     queryset = cropInfo.objects.all().order_by('crops')
-#     serializer_class = cropInfoSerializer
-
-
-# class CropTypes2(APIView):
-#     def get(self, request, format=None):
-
-#         # serialize data
-#         serializer = cropInfo2Serializer(
-#             # cropInfo.objects.all(), many=True, context={'request': request})
-#             cropInfo.objects.all(), many=True)
-
-#         # Easy pattern for returning a single field
-#         # croptypes = [crop.crops for crop in cropInfo.objects.all()]
-
-#         return Response(serializer.data)
-
-
 class CropTypes(viewsets.ModelViewSet):
     queryset = cropType.objects.all().order_by('Id')
     serializer_class = cropTypesSerializer
@@ -54,7 +34,12 @@ class CropTypes2(APIView):
 
         # serialize data
         serializer = cropTypes2Serializer(
+            # cropType.objects.all(), many=True, context={'request': request})
             cropType.objects.all(), many=True)
+
+        # Easy pattern for returning a single field
+        # croptypes = [crop.crops for crop in cropType.objects.all()]  # crops -> Name (check)
+
         return Response(serializer.data)
 
 
@@ -190,24 +175,6 @@ class CalculateDroughtAPIView(APIView):
 
         # Table Queries___________________________
         # ____________________CORP INFO____________________
-        # crop_info = cropInfo.objects.all()
-        # print("crop_info : \n", crop_info)
-        # cropInfoSerializerClass = cropInfoSerializer
-
-        # queryCropInfo = crop_info.filter(crops=inputs["cropType"]).values()
-
-        # for q in queryCropInfo:
-        #     lengthOfGrowingPeriodQUERY = q['lengthOfGrowingPeriodDays']
-        #     maxRootDepthQUERY = q['maxRootDepthInches']
-        #     maxAlllowableDeplitionQUERY = q['maxAlllowableDeplitionPercentage']
-        #     columnForKcQUERY = q['columnForKc']
-        #     columnForDAPQUERY = q['columnForDAP']
-        #     dAPforMaxRootDepthQUERY = q['dAPforMaxRootDepth']
-
-        # print("for crops _", inputs["cropType"], "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
-        #       "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n", "columnForKcQUERY =", columnForKcQUERY, "\n", "columnForDAPQUERY= ", columnForDAPQUERY, "\n",
-        #       "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
-
         croptype = cropType.objects.all()
         print("croptype : \n", croptype)
         cropTypeSerializerClass = cropTypesSerializer
