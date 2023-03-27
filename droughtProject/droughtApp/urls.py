@@ -8,6 +8,7 @@ router.register(r'croptypes', views.CropTypes)
 router.register(r'soiltypes', views.SoilTypes)
 router.register(r'hydrologicgroups', views.hydrologicGroups)
 router.register(r'user', views.user)
+router.register(r'user', views.field)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -20,4 +21,6 @@ urlpatterns = [
          name='hydrologicgroups2'),
     path('user2', views.user2.as_view(),
          name='user2'),
+    path('field2', views.field2.as_view(),
+         name='field2'),
 ]

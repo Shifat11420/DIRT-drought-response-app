@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import testdatamodel,  cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
-#  field, irrigation
-from .models import cropType, soilType, hydrologicGroup, user
+#   irrigation
+from .models import cropType, soilType, hydrologicGroup, user, field
 
 
 class testmodelSerializer(serializers.HyperlinkedModelSerializer):
@@ -79,18 +79,6 @@ class soilType2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class fieldSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = field
-#         fields = '__all__'
-
-
-# class field2Serializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = field
-#         fields = '__all__'
-
-
 class hydrologicGroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = hydrologicGroup
@@ -100,6 +88,30 @@ class hydrologicGroupSerializer(serializers.HyperlinkedModelSerializer):
 class hydrologicGroup2Serializer(serializers.ModelSerializer):
     class Meta:
         model = hydrologicGroup
+        fields = '__all__'
+
+
+class userSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = user
+        fields = '__all__'
+
+
+class user2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = '__all__'
+
+
+class fieldSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = field
+        fields = '__all__'
+
+
+class field2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = field
         fields = '__all__'
 
 
@@ -113,15 +125,3 @@ class hydrologicGroup2Serializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = irrigation
 #         fields = '__all__'
-
-
-class userSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = user
-        fields = '__all__'
-
-
-class user2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = user
-        fields = '__all__'

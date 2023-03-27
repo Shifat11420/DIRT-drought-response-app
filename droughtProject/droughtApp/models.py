@@ -140,21 +140,21 @@ class user(models.Model):
         return str(self.Id)+" "+self.FirstName+" "+self.LastName
 
 
-# class field(models.Model):
-#     Id = models.IntegerField(primary_key=True, null=False)
-#     Name = models.CharField(max_length=50)
-#     Latitude = models.FloatField()
-#     Longitude = models.FloatField()
-#     Acreage = models.IntegerField()
-#     CropTypeId = models.ForeignKey(cropType, on_delete=models.PROTECT)
-#     PlantDate = models.DateField()
-#     SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
-#     HydrologicGroupTypeId = models.ForeignKey(
-#         hydrologicGroup, on_delete=models.PROTECT)
-#     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
+class field(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=50)
+    Latitude = models.FloatField()
+    Longitude = models.FloatField()
+    Acreage = models.IntegerField()
+    CropTypeId = models.ForeignKey(cropType, on_delete=models.PROTECT)
+    PlantDate = models.DateField()
+    SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
+    HydrologicGroupTypeId = models.ForeignKey(
+        hydrologicGroup, on_delete=models.PROTECT)
+    OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
 
-#     def __str__(self):
-#         return str(self.Id)+" "+self.Name
+    def __str__(self):
+        return str(self.Id)+" "+self.Name
 
 
 # class irrigation(models.Model):
