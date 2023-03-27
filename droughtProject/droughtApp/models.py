@@ -120,13 +120,6 @@ class hydrologicGroup(models.Model):
         return str(self.Id)+" "+str(self.Name)
 
 
-# class hydrologicGroup(models.Model):
-#     Id = models.IntegerField(primary_key=True, null=False)
-#     Name = models.CharField(max_length=20)
-
-#     def __str__(self):
-#         return str(self.Id)+" "+self.Name
-
 
 class soilType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
