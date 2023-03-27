@@ -13,18 +13,32 @@ class testdatamodel(models.Model):
         return self.name
 
 
-class cropInfo(models.Model):
-    crops = models.CharField(max_length=20)
-    indicator = models.IntegerField()
-    lengthOfGrowingPeriodDays = models.IntegerField()
-    maxRootDepthInches = models.IntegerField()
-    maxAlllowableDeplitionPercentage = models.IntegerField()
-    columnForKc = models.IntegerField()
-    columnForDAP = models.IntegerField()
-    dAPforMaxRootDepth = models.IntegerField()
+# class cropInfo(models.Model):
+#     crops = models.CharField(max_length=20)
+#     indicator = models.IntegerField()
+#     lengthOfGrowingPeriodDays = models.IntegerField()
+#     maxRootDepthInches = models.IntegerField()
+#     maxAlllowableDeplitionPercentage = models.IntegerField()
+#     columnForKc = models.IntegerField()
+#     columnForDAP = models.IntegerField()
+#     dAPforMaxRootDepth = models.IntegerField()
+
+#     def __str__(self):
+#         return str(self.indicator)+" "+self.crops
+
+
+class cropType(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=20)
+    GrowingPeriodDays = models.IntegerField()
+    MaxRootDepth = models.IntegerField()
+    MaxAlllowableDeplition = models.IntegerField()
+    KC = models.IntegerField()
+    DAP = models.IntegerField()
+    MaxRootDepthDAP = models.IntegerField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.crops
+        return str(self.Id)+" "+self.Name
 
 
 class cropPeriod(models.Model):
@@ -67,14 +81,6 @@ class soilCondition(models.Model):
         return str(self.indicator)+" "+self.soilTexture
 
 
-class hydrologicGroup(models.Model):
-    indicator = models.IntegerField()
-    name = models.CharField(max_length=5)
-
-    def __str__(self):
-        return str(self.indicator)+" "+str(self.name)
-
-
 class soilDrainageGroup(models.Model):
     descriptionForCN = models.CharField(max_length=30)
     indicator = models.IntegerField()
@@ -112,7 +118,71 @@ class userField(models.Model):
     location = models.CharField(max_length=100)
     size = models.FloatField()
     plantDate = models.DateField()
-    cropType = models.ForeignKey(cropInfo, on_delete=models.PROTECT)
+    cropType = models.ForeignKey(cropType, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
+
+# new models
+
+
+class hydrologicGroup(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=5)
+
+    def __str__(self):
+        return str(self.Id)+" "+str(self.Name)
+
+
+# class hydrologicGroup(models.Model):
+#     Id = models.IntegerField(primary_key=True, null=False)
+#     Name = models.CharField(max_length=20)
+
+#     def __str__(self):
+#         return str(self.Id)+" "+self.Name
+
+
+class soilType(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return str(self.Id)+" "+self.Name
+
+
+# class user(models.Model):
+#     Id = models.IntegerField(primary_key=True, null=False)
+#     FirstName = models.CharField(max_length=20)
+#     LastName = models.CharField(max_length=20)
+#     Email = models.EmailField()
+#     AuthenticationInfo = models.CharField(max_length=50)
+
+#     def __str__(self):
+#         return str(self.Id)+" "+self.FirstName+" "+self.LastName
+
+
+# class field(models.Model):
+#     Id = models.IntegerField(primary_key=True, null=False)
+#     Name = models.CharField(max_length=50)
+#     Latitude = models.FloatField()
+#     Longitude = models.FloatField()
+#     Acreage = models.IntegerField()
+#     CropTypeId = models.ForeignKey(cropType, on_delete=models.PROTECT)
+#     PlantDate = models.DateField()
+#     SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
+#     HydrologicGroupTypeId = models.ForeignKey(
+#         hydrologicGroup, on_delete=models.PROTECT)
+#     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
+
+#     def __str__(self):
+#         return str(self.Id)+" "+self.Name
+
+
+# class irrigation(models.Model):
+#     Id = models.IntegerField(primary_key=True, null=False)
+#     FieldId = models.ForeignKey(field, on_delete=models.PROTECT)
+#     Date = models.DateField()
+#     Amount = models.FloatField()
+
+#     def __str__(self):
+#         return str(self.Id)
