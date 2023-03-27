@@ -3,12 +3,13 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'testdatamodel', views.testmodelViewSet)
+
 router.register(r'croptypes', views.CropTypes)
 router.register(r'soiltypes', views.SoilTypes)
 router.register(r'hydrologicgroups', views.hydrologicGroups)
 router.register(r'user', views.user)
-router.register(r'user', views.field)
+router.register(r'field', views.field)
+router.register(r'irrigation', views.irrigation)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -23,4 +24,6 @@ urlpatterns = [
          name='user2'),
     path('field2', views.field2.as_view(),
          name='field2'),
+    path('irrigation2', views.irrigation2.as_view(),
+         name='irrigation2'),
 ]

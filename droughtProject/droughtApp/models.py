@@ -120,7 +120,6 @@ class hydrologicGroup(models.Model):
         return str(self.Id)+" "+str(self.Name)
 
 
-
 class soilType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=20)
@@ -157,11 +156,11 @@ class field(models.Model):
         return str(self.Id)+" "+self.Name
 
 
-# class irrigation(models.Model):
-#     Id = models.IntegerField(primary_key=True, null=False)
-#     FieldId = models.ForeignKey(field, on_delete=models.PROTECT)
-#     Date = models.DateField()
-#     Amount = models.FloatField()
+class irrigation(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    FieldId = models.ForeignKey(field, on_delete=models.PROTECT)
+    Date = models.DateField()
+    Amount = models.FloatField()
 
-#     def __str__(self):
-#         return str(self.Id)
+    def __str__(self):
+        return str(self.Id)+str(self.Date)

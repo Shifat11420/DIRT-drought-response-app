@@ -4,11 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from .models import testdatamodel, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
-from droughtApp.serializers import testmodelSerializer,  cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
+from droughtApp.serializers import cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
 
-from .models import cropType, soilType, user, field  #  irrigation
-# , irrigationSerializer, irrigation2Serializer
-from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer, fieldSerializer, field2Serializer
+from .models import cropType, soilType, user, field, irrigation
+from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer, fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer
 
 # drought calculator imports
 from datetime import datetime, timedelta
@@ -17,12 +16,6 @@ from .functions import *
 
 
 # AERISweatherAPI
-
-
-class testmodelViewSet(viewsets.ModelViewSet):
-    queryset = testdatamodel.objects.all().order_by('id')
-    serializer_class = testmodelSerializer
-
 
 class CropTypes(viewsets.ModelViewSet):
     queryset = cropType.objects.all().order_by('Id')
@@ -59,7 +52,6 @@ class SoilTypes2(APIView):
         return Response(serializer.data)
 
 
-# hydrologic groups
 class hydrologicGroups(viewsets.ModelViewSet):
     queryset = hydrologicGroup.objects.all().order_by('Id')
     serializer_class = hydrologicGroupSerializer
@@ -74,22 +66,6 @@ class hydrologicGroups2(APIView):
 
         return Response(serializer.data)
 
-# for new models
-
-
-# class irrigation(viewsets.ModelViewSet):
-#     queryset = irrigation.objects.all().order_by('Id')
-#     serializer_class = irrigationSerializer
-
-
-# class irrigation2(APIView):
-#     def get(self, request, format=None):
-
-#         # serialize data
-#         serializer = irrigation2Serializer(
-#             irrigation.objects.all(), many=True)
-
-
 
 class user(viewsets.ModelViewSet):
     queryset = user.objects.all().order_by('Id')
@@ -102,7 +78,7 @@ class user2(APIView):
         # serialize data
         serializer = user2Serializer(
             user.objects.all(), many=True)
-        
+
 
 class field(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
@@ -116,6 +92,18 @@ class field2(APIView):
         serializer = field2Serializer(
             field.objects.all(), many=True)
 
+
+class irrigation(viewsets.ModelViewSet):
+    queryset = irrigation.objects.all().order_by('Id')
+    serializer_class = irrigationSerializer
+
+
+class irrigation2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = irrigation2Serializer(
+            irrigation.objects.all(), many=True)
 
 # drought calculator
 ####################################################################

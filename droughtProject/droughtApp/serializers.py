@@ -1,13 +1,6 @@
 from rest_framework import serializers
-from .models import testdatamodel,  cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
-#   irrigation
-from .models import cropType, soilType, hydrologicGroup, user, field
-
-
-class testmodelSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = testdatamodel
-        fields = ('id', 'name', 'alias', 'date')
+from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
+from .models import cropType, soilType, hydrologicGroup, user, field, irrigation
 
 
 class cropTypesSerializer(serializers.HyperlinkedModelSerializer):
@@ -115,13 +108,13 @@ class field2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class irrigationSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = irrigation
-#         fields = '__all__'
+class irrigationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = irrigation
+        fields = '__all__'
 
 
-# class irrigation2Serializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = irrigation
-#         fields = '__all__'
+class irrigation2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = irrigation
+        fields = '__all__'
