@@ -3,7 +3,8 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from .models import testdatamodel, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
+
+from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
 from droughtApp.serializers import cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
 
 from .models import cropType, soilType, user, field, irrigation
@@ -62,48 +63,59 @@ class hydrologicGroups2(APIView):
 
         # serialize data
         serializer = hydrologicGroupSerializer(
-            hydrologicGroup.objects.all(), many=True)
+            hydrologicGroup.objects.all(), many=True, context={'request': request})
 
         return Response(serializer.data)
 
 
-class user(viewsets.ModelViewSet):
+class userInfo(viewsets.ModelViewSet):
     queryset = user.objects.all().order_by('Id')
     serializer_class = userSerializer
 
 
-class user2(APIView):
+class userInfo2(APIView):
     def get(self, request, format=None):
 
         # serialize data
         serializer = user2Serializer(
             user.objects.all(), many=True)
+        return Response(serializer.data)
 
 
-class field(viewsets.ModelViewSet):
+class userfield(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
 
 
-class field2(APIView):
+class userfield2(APIView):
     def get(self, request, format=None):
 
         # serialize data
         serializer = field2Serializer(
             field.objects.all(), many=True)
+        return Response(serializer.data)
 
 
-class irrigation(viewsets.ModelViewSet):
+    def post(request):
+        serializer = field2Serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class irrigationActivity(viewsets.ModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
 
 
-class irrigation2(APIView):
+class irrigationActivity2(APIView):
     def get(self, request, format=None):
 
         # serialize data
         serializer = irrigation2Serializer(
             irrigation.objects.all(), many=True)
+        return Response(serializer.data)
+
 
 # drought calculator
 ####################################################################

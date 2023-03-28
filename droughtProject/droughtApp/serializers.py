@@ -57,9 +57,6 @@ class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-# new models
-
-
 class soilTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = soilType

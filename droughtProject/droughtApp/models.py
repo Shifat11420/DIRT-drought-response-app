@@ -98,16 +98,16 @@ class unitConversion(models.Model):
         return self.flowMeterReadings
 
 
-class userField(models.Model):
-    fieldId = models.IntegerField()
-    name = models.CharField(max_length=50)
-    location = models.CharField(max_length=100)
-    size = models.FloatField()
-    plantDate = models.DateField()
-    cropType = models.ForeignKey(cropType, on_delete=models.PROTECT)
+# class userField(models.Model):
+#     fieldId = models.IntegerField()
+#     name = models.CharField(max_length=50)
+#     location = models.CharField(max_length=100)
+#     size = models.FloatField()
+#     plantDate = models.DateField()
+#     cropType = models.ForeignKey(cropType, on_delete=models.PROTECT)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 # new models
 
