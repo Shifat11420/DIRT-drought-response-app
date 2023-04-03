@@ -4,11 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
-from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
-from droughtApp.serializers import cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
+# from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
+# from droughtApp.serializers import cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
 
-from .models import cropType, soilType, user, field, irrigation
-from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer, fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer
+# from .models import cropType, soilType, user, field, irrigation
+# from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer, fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer
+
+
+from .models import *
+from .serializers import *
 
 # drought calculator imports
 from datetime import datetime, timedelta
@@ -37,7 +41,68 @@ class CropTypes2(APIView):
         return Response(serializer.data)
 
 
+class CropType1ViewSet(viewsets.ModelViewSet):
+    queryset = cropType1.objects.all().order_by('Id')
+    serializer_class = cropType1Serializer
+
+
+class CropType12View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = cropType12Serializer(
+            cropType1.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class CropPeriod1ViewSet(viewsets.ModelViewSet):
+    queryset = cropPeriod1.objects.all().order_by('Id')
+    serializer_class = cropPeriod1Serializer
+
+
+class CropPeriod12View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = cropPeriod12Serializer(
+            cropPeriod1.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class drainageTypeViewSet(viewsets.ModelViewSet):
+    queryset = drainageType.objects.all().order_by('Id')
+    serializer_class = drainageTypeSerializer
+
+
+class drainageType2View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = drainageType2Serializer(
+            drainageType.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class soilMoisture1ViewSet(viewsets.ModelViewSet):
+    queryset = soilMoisture1.objects.all().order_by('Id')
+    serializer_class = soilMoisture1Serializer
+
+
+class soilMoisture12View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = soilMoisture12Serializer(
+            soilMoisture1.objects.all(), many=True)
+
+        return Response(serializer.data)
+
 # soil types
+
+
 class SoilTypes(viewsets.ModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
     serializer_class = soilType2Serializer

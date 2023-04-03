@@ -11,6 +11,12 @@ router.register(r'user', views.userInfo)
 router.register(r'fields', views.userfield)
 router.register(r'irrigation', views.irrigationActivity)
 
+
+router.register(r'SoilMoisture1', views.soilMoisture1ViewSet)
+router.register(r'CropType1', views.CropType1ViewSet)
+router.register(r'CropPeriod1', views.CropPeriod1ViewSet)
+router.register(r'drainageType', views.drainageTypeViewSet)
+
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
