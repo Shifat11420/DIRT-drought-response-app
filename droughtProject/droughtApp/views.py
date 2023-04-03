@@ -95,7 +95,6 @@ class userfield2(APIView):
             field.objects.all(), many=True)
         return Response(serializer.data)
 
-
     def post(request):
         serializer = field2Serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

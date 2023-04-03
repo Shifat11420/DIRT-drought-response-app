@@ -80,12 +80,12 @@ class soilDrainageGroup(models.Model):
 
 
 class soilMoisture(models.Model):
+    indicator = models.IntegerField(primary_key=True, null=False)
     initialConditions = models.CharField(max_length=30)
-    indicator = models.IntegerField()
     ratio = models.FloatField()
 
     def __str__(self):
-        return str(self.indicator)+" "+self.initialConditions
+        return str(self.indicator)+" "+str(self.initialConditions)
 
 
 class unitConversion(models.Model):
@@ -109,7 +109,39 @@ class unitConversion(models.Model):
 #     def __str__(self):
 #         return self.name
 
+
 # new models
+class cropType1(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=20)
+    GrowingPeriodDays = models.IntegerField()
+    MaxRootDepth = models.IntegerField()
+    MaxAlllowableDeplition = models.IntegerField()
+    MaxRootDepthDAP = models.IntegerField()
+
+    def __str__(self):
+        return str(self.Id)+" "+self.Name
+
+
+class cropPeriod1(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=30)
+    CropTypeId = models.ForeignKey(
+        cropType1, on_delete=models.PROTECT, null=True)
+    KC = models.CharField(max_length=30)
+    DAP = models.IntegerField()
+
+    def __str__(self):
+        return str(self.Id)+" "+self.Name+" "+str(self.CropTypeId)
+
+
+class soilMoisture1(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=30)
+    Ratio = models.FloatField()
+
+    def __str__(self):
+        return str(self.Id)+" "+self.Name
 
 
 class hydrologicGroup(models.Model):
@@ -123,9 +155,22 @@ class hydrologicGroup(models.Model):
 class soilType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=20)
+    AveragePlantAvailableWater = models.FloatField(null=True)
+    PermanentWiltingPoint = models.FloatField(null=True)
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
+
+
+class drainageType(models.Model):
+    Id = models.IntegerField(primary_key=True, null=False)
+    Name = models.CharField(max_length=50)
+    HydrologicGroupTypeId = models.ForeignKey(
+        hydrologicGroup, on_delete=models.PROTECT)
+    ValueField = models.IntegerField()
+
+    def __str__(self):
+        return str(self.Id)+" "+self.Name+" "+str(self.HydrologicGroupTypeId)
 
 
 class user(models.Model):
@@ -145,11 +190,18 @@ class field(models.Model):
     Latitude = models.FloatField()
     Longitude = models.FloatField()
     Acreage = models.IntegerField()
-    CropTypeId = models.ForeignKey(cropType, on_delete=models.PROTECT)
+    CropTypeId = models.ForeignKey(
+        cropType1, on_delete=models.PROTECT, blank=True, null=True)
     PlantDate = models.DateField()
     SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
     HydrologicGroupTypeId = models.ForeignKey(
         hydrologicGroup, on_delete=models.PROTECT)
+    CropPeriodId = models.ForeignKey(
+        cropPeriod1, on_delete=models.PROTECT, null=True)
+    SoilMoistureId = models.ForeignKey(
+        soilMoisture1, on_delete=models.PROTECT, null=True)
+    DrainageTypeId = models.ForeignKey(
+        drainageType, on_delete=models.PROTECT, null=True)
     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
 
     def __str__(self):
