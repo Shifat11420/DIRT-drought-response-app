@@ -19,29 +19,39 @@ class cropType(models.Model):
     GrowingPeriodDays = models.IntegerField()
     MaxRootDepth = models.IntegerField()
     MaxAlllowableDeplition = models.IntegerField()
-    KC = models.IntegerField()
-    DAP = models.IntegerField()
     MaxRootDepthDAP = models.IntegerField()
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
 
 
-class cropPeriod(models.Model):
-    period = models.CharField(max_length=30)
-    kcforCorn = models.CharField(max_length=30)
-    dAPforCorn = models.IntegerField()
-    kcforSoybean = models.CharField(max_length=30)
-    dAPforSoybean = models.IntegerField()
-    kcforCotton = models.CharField(max_length=30)
-    dAPforCotton = models.IntegerField()
-    kcforGrainSorghum = models.CharField(max_length=30)
-    dAPforSorghum = models.IntegerField()
-    kcforSugarcane = models.CharField(max_length=30)
-    dAPforSugarcane = models.IntegerField()
+# class cropType1(models.Model):
+#     Id = models.IntegerField(primary_key=True, null=False)
+#     Name = models.CharField(max_length=20)
+#     GrowingPeriodDays = models.IntegerField()
+#     MaxRootDepth = models.IntegerField()
+#     MaxAlllowableDeplition = models.IntegerField()
+#     MaxRootDepthDAP = models.IntegerField()
 
-    def __str__(self):
-        return str(self.period)
+#     def __str__(self):
+#         return str(self.Id)+" "+self.Name
+
+
+# class cropPeriod(models.Model):
+#     period = models.CharField(max_length=30)
+#     kcforCorn = models.CharField(max_length=30)
+#     dAPforCorn = models.IntegerField()
+#     kcforSoybean = models.CharField(max_length=30)
+#     dAPforSoybean = models.IntegerField()
+#     kcforCotton = models.CharField(max_length=30)
+#     dAPforCotton = models.IntegerField()
+#     kcforGrainSorghum = models.CharField(max_length=30)
+#     dAPforSorghum = models.IntegerField()
+#     kcforSugarcane = models.CharField(max_length=30)
+#     dAPforSugarcane = models.IntegerField()
+
+#     def __str__(self):
+#         return str(self.period)
 
 
 class growthStage(models.Model):
@@ -111,23 +121,13 @@ class unitConversion(models.Model):
 
 
 # new models
-class cropType1(models.Model):
-    Id = models.IntegerField(primary_key=True, null=False)
-    Name = models.CharField(max_length=20)
-    GrowingPeriodDays = models.IntegerField()
-    MaxRootDepth = models.IntegerField()
-    MaxAlllowableDeplition = models.IntegerField()
-    MaxRootDepthDAP = models.IntegerField()
-
-    def __str__(self):
-        return str(self.Id)+" "+self.Name
 
 
 class cropPeriod1(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=30)
     CropTypeId = models.ForeignKey(
-        cropType1, on_delete=models.PROTECT, null=True)
+        cropType, on_delete=models.PROTECT, null=True)
     KC = models.CharField(max_length=30)
     DAP = models.IntegerField()
 
@@ -191,7 +191,7 @@ class field(models.Model):
     Longitude = models.FloatField()
     Acreage = models.IntegerField()
     CropTypeId = models.ForeignKey(
-        cropType1, on_delete=models.PROTECT, blank=True, null=True)
+        cropType, on_delete=models.PROTECT, blank=True, null=True)
     PlantDate = models.DateField()
     SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
     HydrologicGroupTypeId = models.ForeignKey(

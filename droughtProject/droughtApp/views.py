@@ -4,13 +4,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 
-# from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion, hydrologicGroup
-# from droughtApp.serializers import cropPeriodSerializer, growthStageSerializer, soilConditionSerializer,  soilCondition2Serializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer, hydrologicGroupSerializer
-
-# from .models import cropType, soilType, user, field, irrigation
-# from .serializers import cropTypesSerializer, cropTypes2Serializer, soilTypeSerializer, soilType2Serializer, userSerializer, user2Serializer, fieldSerializer, field2Serializer, irrigationSerializer, irrigation2Serializer
-
-
 from .models import *
 from .serializers import *
 
@@ -41,19 +34,19 @@ class CropTypes2(APIView):
         return Response(serializer.data)
 
 
-class CropType1ViewSet(viewsets.ModelViewSet):
-    queryset = cropType1.objects.all().order_by('Id')
-    serializer_class = cropType1Serializer
+# class CropType1ViewSet(viewsets.ModelViewSet):
+#     queryset = cropType1.objects.all().order_by('Id')
+#     serializer_class = cropType1Serializer
 
 
-class CropType12View(APIView):
-    def get(self, request, format=None):
+# class CropType12View(APIView):
+#     def get(self, request, format=None):
 
-        # serialize data
-        serializer = cropType12Serializer(
-            cropType1.objects.all(), many=True)
+#         # serialize data
+#         serializer = cropType12Serializer(
+#             cropType1.objects.all(), many=True)
 
-        return Response(serializer.data)
+#         return Response(serializer.data)
 
 
 class CropPeriod1ViewSet(viewsets.ModelViewSet):
@@ -217,7 +210,7 @@ class CalculateDroughtAPIView(APIView):
         print("inputs[plantDate] = ", inputs["plantDate"])
         plantingDate = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         print("plantingDate = ", plantingDate)
-        print(cropType.objects.all())
+
         # API request
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
             plantingDate)
@@ -236,19 +229,23 @@ class CalculateDroughtAPIView(APIView):
             lengthOfGrowingPeriodQUERY = q['GrowingPeriodDays']
             maxRootDepthQUERY = q['MaxRootDepth']
             maxAlllowableDeplitionQUERY = q['MaxAlllowableDeplition']
-            columnForKcQUERY = q['KC']
-            columnForDAPQUERY = q['DAP']
+            # columnForKcQUERY = q['KC']
+            # columnForDAPQUERY = q['DAP']
             dAPforMaxRootDepthQUERY = q['MaxRootDepthDAP']
 
         print("for crops _", inputs["cropType"], "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
-              "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n", "columnForKcQUERY =", columnForKcQUERY, "\n", "columnForDAPQUERY= ", columnForDAPQUERY, "\n",
+              "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n",
               "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
         ##
 
         # ____________________CORP PERIOD____________________
-        crop_period = cropPeriod.objects.all()
-        print("crop_period : \n", crop_period)
-        cropPeriodSerializerClass = cropPeriodSerializer
+        # crop_period = cropPeriod.objects.all()
+        # print("crop_period : \n", crop_period)
+        # cropPeriodSerializerClass = cropPeriodSerializer
+
+        crop_period1 = cropPeriod1.objects.all()
+        print("crop_period1 : \n", crop_period1)
+        cropPeriod1SerializerClass = cropPeriod1Serializer
 
         ##
         # ____________________GROWTH STAGE____________________
@@ -355,39 +352,70 @@ class CalculateDroughtAPIView(APIView):
                         for i, j in zip(field_capacity, perm_wilt_point)]
 
         #
-        if inputs["cropType"] == "Corn":
-            kc = "kcforCorn"
-            dap = "dAPforCorn"
-        if inputs["cropType"] == "Soybean":
-            kc = "kcforSoybean"
-            dap = "dAPforSoybean"
-        if inputs["cropType"] == "Cotton":
-            kc = "kcforCotton"
-            dap = "dAPforCotton"
-        if inputs["cropType"] == "Grain Sorghum":
-            kc = "kcforGrainSorghum"
-            dap = "dAPforSorghum"
-        if inputs["cropType"] == "Sugarcane":
-            kc = "kcforSugarcane"
-            dap = "dAPforSugarcane"
-        #
+        # if inputs["cropType"] == "Corn":
+        #     kc = "kcforCorn"
+        #     dap = "dAPforCorn"
+        # if inputs["cropType"] == "Soybean":
+        #     kc = "kcforSoybean"
+        #     dap = "dAPforSoybean"
+        # if inputs["cropType"] == "Cotton":
+        #     kc = "kcforCotton"
+        #     dap = "dAPforCotton"
+        # if inputs["cropType"] == "Grain Sorghum":
+        #     kc = "kcforGrainSorghum"
+        #     dap = "dAPforSorghum"
+        # if inputs["cropType"] == "Sugarcane":
+        #     kc = "kcforSugarcane"
+        #     dap = "dAPforSugarcane"
 
+        # demo is the cropid matched from croptype
+        cropIdForType = cropType.objects.filter(
+            Name=inputs["cropType"]).values()[0]['Id']
+        print("cropIdForType = ", cropIdForType)
+
+        # cropPeriodForId is filtered for the cropId from cropPeriod
+        cropPeriodForId = cropPeriod1.objects.filter(
+            CropTypeId=cropIdForType).all()
+
+        print("cropPeriodForId = ", cropPeriodForId)
+
+        ##
+
+        # for item in daps:
+        #     if daps[item] == "":
+        #         daps[item] = list(cropPeriod.objects.all().filter(
+        #             period__icontains=item).values(dap))[0][dap]
+        # print("daps----", daps)
+        #
         for item in daps:
             if daps[item] == "":
-                daps[item] = list(cropPeriod.objects.all().filter(
-                    period__icontains=item).values(dap))[0][dap]
-        print("daps----", daps)
+                daps[item] = float(cropPeriodForId.filter(
+                    Name=item).values()[0]['DAP'])
+        print("daps---", daps)
+        # #
+
+        #
+        # for item in cropCoeff:
+        #     if cropCoeff[item] == "":
+        #         cropCoeff[item] = float(list(cropPeriod.objects.all().filter(
+        #             period__icontains=item).values(dap))[0][kc])
+        # print("cropcoeff----", cropCoeff)
+        # #
 
         for item in cropCoeff:
             if cropCoeff[item] == "":
-                cropCoeff[item] = float(list(cropPeriod.objects.all().filter(
-                    period__icontains=item).values(dap))[0][kc])
-        print("cropcoeff----", cropCoeff)
+                kcValue = cropPeriodForId.filter(
+                    Name=item).values()[0]['KC']
+                cropCoeff[item] = float(kcValue) if not (kcValue == "Linear") else kcValue
+        print("cropcoeff---", cropCoeff)
 
         dev_slope = (cropCoeff['Mid'] - cropCoeff['Early']
                      )/(daps['Mid'] - daps['Development'])
         late_slope = (cropCoeff['Last Irrig. Event'] - cropCoeff['Mid']
                       )/(daps['Last Irrig. Event'] - daps['Late'])
+
+        print(" dev_slope = ", dev_slope, " late_slope = ", late_slope)
+        #
 
         Kc = []
         for coeff in days_after_planting:

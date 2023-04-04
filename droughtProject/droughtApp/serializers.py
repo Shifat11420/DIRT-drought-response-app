@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
+from .models import growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
 from .models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from .models import cropType1, cropPeriod1, soilMoisture1, drainageType
+from .models import cropPeriod1, soilMoisture1, drainageType  # cropType1, cropPeriod,
 
 
 class cropTypesSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,10 +16,10 @@ class cropTypes2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = cropPeriod
-        fields = '__all__'
+# class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = cropPeriod
+#         fields = '__all__'
 
 
 class growthStageSerializer(serializers.HyperlinkedModelSerializer):
@@ -58,16 +58,16 @@ class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class cropType1Serializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = cropType1
-        fields = '__all__'
+# class cropType1Serializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = cropType1
+#         fields = '__all__'
 
 
-class cropType12Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = cropType1
-        fields = '__all__'
+# class cropType12Serializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = cropType1
+#         fields = '__all__'
 
 
 class cropPeriod1Serializer(serializers.HyperlinkedModelSerializer):
