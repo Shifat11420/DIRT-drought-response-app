@@ -551,7 +551,6 @@ class CalculateDroughtAPIView(APIView):
         print("\n\n")
         # #######
         # #increase day incrementally
-        # calculate total days from today-planting day *** #needTODO
         dateplanted = plantingDate.strftime('%m/%d/%Y')
         print("planting Date = ", dateplanted)
 
