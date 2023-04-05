@@ -255,23 +255,39 @@ class CalculateDroughtAPIView(APIView):
 
         ##
         # ____________________SOIL CONDITION____________________
-        soil_condition = soilCondition.objects.all()
-        print("soil_condition : \n", soil_condition)
-        soilConditionSerializerClass = soilConditionSerializer
+        # soil_condition = soilCondition.objects.all()
+        # print("soil_condition : \n", soil_condition)
+        # soilConditionSerializerClass = soilConditionSerializer
 
-        soilConditionInfo = soil_condition.filter(
-            soilTexture=inputs["soilType"]).values()
+        # soilConditionInfo = soil_condition.filter(
+        #     soilTexture=inputs["soilType"]).values()
 
-        for q in soilConditionInfo:
-            averagePlantAvailableWaterInFtQUERY = q['averagePlantAvailableWaterInFt']
-            averagePlantAvailableWaterInInQUERY = q['averagePlantAvailableWaterInIn']
-            permanentWiltingPointInInQUERY = q['permanentWiltingPointInIn']
+        # for q in soilConditionInfo:
+        #     averagePlantAvailableWaterInFtQUERY = q['averagePlantAvailableWaterInFt']
+        #     averagePlantAvailableWaterInInQUERY = q['averagePlantAvailableWaterInIn']
+        #     permanentWiltingPointInInQUERY = q['permanentWiltingPointInIn']
 
-        # print("for soil type _",inputs["soilType"],"_ \n",
-        # "averagePlantAvailableWaterInFt = ",averagePlantAvailableWaterInFtQUERY,"\n",
-        # "averagePlantAvailableWaterInInQUERY =", averagePlantAvailableWaterInInQUERY ,"\n",
-        # "permanentWiltingPointInInQUERY = ", permanentWiltingPointInInQUERY)
-        ##
+        # print("for soil type _", inputs["soilType"], "_ \n",
+        #       "averagePlantAvailableWaterInFt = ", averagePlantAvailableWaterInFtQUERY, "\n",
+        #       "averagePlantAvailableWaterInInQUERY =", averagePlantAvailableWaterInInQUERY, "\n",
+        #       "permanentWiltingPointInInQUERY = ", permanentWiltingPointInInQUERY)
+        # ##
+
+        # ____________________SOIL TYPE____________________
+        soilTypeInfoall = soilType.objects.all()
+        print("soil type : \n", soilTypeInfoall)
+        soilTypeSerializerClass = soilTypeSerializer
+
+        soilTypeInfo = soilType.objects.filter(
+            Name=inputs["soilType"]).values()
+
+        for q in soilTypeInfo:
+            averagePlantAvailableWaterQUERY = q['AveragePlantAvailableWater']
+            permanentWiltingPointQUERY = q['PermanentWiltingPoint']
+
+        print("for soil type _", inputs["soilType"], "_ \n",
+              "averagePlantAvailableWaterQUERY =", averagePlantAvailableWaterQUERY, "\n",
+              "permanentWiltingPointQUERY = ", permanentWiltingPointQUERY)
 
         # ____________________SOIL DRAINAGE GROUP and HYDROLOGIC GROUP____________________
 
@@ -279,27 +295,57 @@ class CalculateDroughtAPIView(APIView):
             Name=inputs["hydroSoilGrp"]).values()[0]['Name']
         print("hydrogrpQUERY = ", hydrogrpQUERY)
 
-        soil_drainage_group = soilDrainageGroup.objects.all()
-        print("soil_drainage_group  : \n", soil_drainage_group)
-        soilDrainageGroupSerializerClass = soilDrainageGroupSerializer
+        hydrogrpQUERY = hydrologicGroup.objects.filter(
+            Name=inputs["hydroSoilGrp"]).values()[0]
+        hydrogroupName = hydrogrpQUERY['Name']
+        hydrogroupId = hydrogrpQUERY['Id']
+        print("hydrogroupName = ", hydrogroupName)
+        print("hydrogroupId = ", hydrogroupId)
 
-        soilDrainageGroupInfo = soil_drainage_group.filter(
-            descriptionForCN=inputs["plantCond"]).values()
-        print("soilDrainageGroupInfo======", soilDrainageGroupInfo)
+        # soil_drainage_group = soilDrainageGroup.objects.all()
+        # print("soil_drainage_group  : \n", soil_drainage_group)
+        # soilDrainageGroupSerializerClass = soilDrainageGroupSerializer
 
-        for q in soilDrainageGroupInfo:
-            hydroSoilvalueQUERY = q[str(hydrogrpQUERY)]
-        print("hydroSoilvalueQUERY = ", hydroSoilvalueQUERY)
+        # soilDrainageGroupInfo = soil_drainage_group.filter(
+        #     descriptionForCN=inputs["plantCond"]).values()
+        # print("soilDrainageGroupInfo======", soilDrainageGroupInfo)
+
+        # for q in soilDrainageGroupInfo:
+        #     hydroSoilvalueQUERY = q[str(hydrogroupName)]
+        # print("hydroSoilvalueQUERY = ", hydroSoilvalueQUERY)
+
+        ##
+        drainageTypeInfo = drainageType.objects.all()
+        print("drainageTypeInfo  : \n", drainageTypeInfo)
+        drainageTypeSerializerClass = drainageTypeSerializer
+
+        soildrainageTypeValue = drainageTypeInfo.filter(
+            Name=inputs["plantCond"], HydrologicGroupTypeId=hydrogroupId).values()[0]['ValueField']
+        print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
-        soil_moisture = soilMoisture.objects.all()
+        # soil_moisture = soilMoisture.objects.all()
+        # print("soil_moisture  : \n", soil_moisture)
+        # soilMoistureSerializerClass = soilMoistureSerializer
+
+        # soilMoistureInfo = soil_moisture.filter(
+        #     initialConditions=inputs["initMoistCond"]).values()
+        # print("soilMoistureInfo = ", soilMoistureInfo)
+        # for q in soilMoistureInfo:
+        #     ratioQUERY = q['ratio']
+        # print("ratioQUERY = ", ratioQUERY)
+
+        ##
+        soil_moisture = soilMoisture1.objects.all()
         print("soil_moisture  : \n", soil_moisture)
-        soilMoistureSerializerClass = soilMoistureSerializer
+        soilMoistureSerializerClass = soilMoisture1Serializer
 
         soilMoistureInfo = soil_moisture.filter(
-            initialConditions=inputs["initMoistCond"]).values()
+            Name=inputs["initMoistCond"]).values()
+        print("soilMoistureInfo = ", soilMoistureInfo)
         for q in soilMoistureInfo:
-            ratioQUERY = q['ratio']
+            ratioQUERY = q['Ratio']
+        print("ratioQUERY = ", ratioQUERY)
 
         # ____________________UNIT CONVERSION____________________
         unit_conversion = unitConversion.objects.all()
@@ -334,12 +380,12 @@ class CalculateDroughtAPIView(APIView):
                 root_depth.append(max_root_depth)
 
         if inputs["permWiltPoint"] == "":
-            inputs["permWiltPoint"] = permanentWiltingPointInInQUERY
+            inputs["permWiltPoint"] = permanentWiltingPointQUERY
             print("inputs[permWiltPoint]", inputs["permWiltPoint"])
 
         if inputs["fieldCap"] == "":
             inputs["fieldCap"] = inputs["permWiltPoint"] + \
-                averagePlantAvailableWaterInInQUERY
+                averagePlantAvailableWaterQUERY
             print("inputs[fieldCap]", inputs["fieldCap"])
 
         field_capacity = [round(i*inputs["fieldCap"], 2) for i in root_depth]
@@ -406,7 +452,8 @@ class CalculateDroughtAPIView(APIView):
             if cropCoeff[item] == "":
                 kcValue = cropPeriodForId.filter(
                     Name=item).values()[0]['KC']
-                cropCoeff[item] = float(kcValue) if not (kcValue == "Linear") else kcValue
+                cropCoeff[item] = float(kcValue) if not (
+                    kcValue == "Linear") else kcValue
         print("cropcoeff---", cropCoeff)
 
         dev_slope = (cropCoeff['Mid'] - cropCoeff['Early']
@@ -431,7 +478,7 @@ class CalculateDroughtAPIView(APIView):
             else:
                 Kc.append(cropCoeff['Last Irrig. Event'])
 
-        storage = (1000/hydroSoilvalueQUERY) - 10
+        storage = (1000/soildrainageTypeValue) - 10
         print("inputs[plantCond] = ", inputs["plantCond"],
               "inputs[hydroSoilGrp] = ", inputs["hydroSoilGrp"], "storage =", storage)
 
