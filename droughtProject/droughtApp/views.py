@@ -7,7 +7,7 @@ from .models import *
 from .serializers import *
 
 # drought calculator imports
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from .functionAPI import *
 from .functions import *
 
@@ -552,7 +552,22 @@ class CalculateDroughtAPIView(APIView):
         # #######
         # #increase day incrementally
         # calculate total days from today-planting day *** #needTODO
-        totaldays = 5
+        dateplanted = plantingDate.strftime('%m/%d/%Y')
+        print("planting Date = ", dateplanted)
+
+        today = date.today()
+        todaydate = today.strftime("%m/%d/%Y")
+        print("today's date =", todaydate)
+
+        date_format = "%m/%d/%Y"
+        a = datetime.strptime(dateplanted, date_format)
+        b = datetime.strptime(todaydate, date_format)
+
+        delta = b - a
+        totaldays = delta.days
+
+        print("totaldays = ", totaldays)
+
         # rain = 0        #API
 
         for dayI in range(1, totaldays+1):  # starts the day after planting day
