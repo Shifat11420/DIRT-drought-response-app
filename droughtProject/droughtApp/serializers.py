@@ -1,8 +1,7 @@
 from rest_framework import serializers
-# soilCondition,soilMoisture,
-from .models import growthStage, unitConversion  # soilDrainageGroup,
+from .models import growthStage, unitConversion
 from .models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from .models import cropPeriod1, soilMoisture1, drainageType  # cropType1, cropPeriod,
+from .models import cropPeriod1, soilMoisture1, drainageType
 
 
 class cropTypesSerializer(serializers.HyperlinkedModelSerializer):
@@ -17,58 +16,16 @@ class cropTypes2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = cropPeriod
-#         fields = '__all__'
-
-
 class growthStageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = growthStage
         fields = '__all__'
 
 
-# class soilMoistureSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = soilMoisture
-#         fields = '__all__'
-
-
-# class soilConditionSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = soilCondition
-#         fields = '__all__'
-
-
-# class soilCondition2Serializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = soilCondition
-#         fields = '__all__'
-
-
-# class soilDrainageGroupSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = soilDrainageGroup
-#         fields = '__all__'
-
-
 class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = unitConversion
         fields = '__all__'
-
-
-# class cropType1Serializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = cropType1
-#         fields = '__all__'
-
-
-# class cropType12Serializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = cropType1
-#         fields = '__all__'
 
 
 class cropPeriod1Serializer(serializers.HyperlinkedModelSerializer):

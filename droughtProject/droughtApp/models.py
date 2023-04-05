@@ -1,18 +1,8 @@
 import datetime
 from django.db import models
 
+
 # Create your models here.
-
-
-class testdatamodel(models.Model):
-    name = models.CharField(max_length=60)
-    alias = models.CharField(max_length=60)
-    date = models.DateField(default=datetime.date.today)
-
-    def __str__(self):
-        return self.name
-
-
 class cropType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=20)
@@ -23,35 +13,6 @@ class cropType(models.Model):
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
-
-
-# class cropType1(models.Model):
-#     Id = models.IntegerField(primary_key=True, null=False)
-#     Name = models.CharField(max_length=20)
-#     GrowingPeriodDays = models.IntegerField()
-#     MaxRootDepth = models.IntegerField()
-#     MaxAlllowableDeplition = models.IntegerField()
-#     MaxRootDepthDAP = models.IntegerField()
-
-#     def __str__(self):
-#         return str(self.Id)+" "+self.Name
-
-
-# class cropPeriod(models.Model):
-#     period = models.CharField(max_length=30)
-#     kcforCorn = models.CharField(max_length=30)
-#     dAPforCorn = models.IntegerField()
-#     kcforSoybean = models.CharField(max_length=30)
-#     dAPforSoybean = models.IntegerField()
-#     kcforCotton = models.CharField(max_length=30)
-#     dAPforCotton = models.IntegerField()
-#     kcforGrainSorghum = models.CharField(max_length=30)
-#     dAPforSorghum = models.IntegerField()
-#     kcforSugarcane = models.CharField(max_length=30)
-#     dAPforSugarcane = models.IntegerField()
-
-#     def __str__(self):
-#         return str(self.period)
 
 
 class growthStage(models.Model):
@@ -66,38 +27,6 @@ class growthStage(models.Model):
         return str(self.indicator)+" "+self.crop
 
 
-# class soilCondition(models.Model):
-#     soilTexture = models.CharField(max_length=30)
-#     indicator = models.IntegerField()
-#     averagePlantAvailableWaterInFt = models.FloatField()
-#     averagePlantAvailableWaterInIn = models.FloatField()
-#     permanentWiltingPointInIn = models.FloatField()
-
-#     def __str__(self):
-#         return str(self.indicator)+" "+self.soilTexture
-
-
-# class soilDrainageGroup(models.Model):
-#     descriptionForCN = models.CharField(max_length=30)
-#     indicator = models.IntegerField()
-#     A = models.IntegerField()
-#     B = models.IntegerField()
-#     C = models.IntegerField()
-#     D = models.IntegerField()
-
-#     def __str__(self):
-#         return str(self.indicator)+" "+self.descriptionForCN
-
-
-# class soilMoisture(models.Model):
-#     indicator = models.IntegerField(primary_key=True, null=False)
-#     initialConditions = models.CharField(max_length=30)
-#     ratio = models.FloatField()
-
-#     def __str__(self):
-#         return str(self.indicator)+" "+str(self.initialConditions)
-
-
 class unitConversion(models.Model):
     flowMeterReadings = models.CharField(max_length=30)
     indicator = models.IntegerField()
@@ -106,21 +35,6 @@ class unitConversion(models.Model):
 
     def __str__(self):
         return self.flowMeterReadings
-
-
-# class userField(models.Model):
-#     fieldId = models.IntegerField()
-#     name = models.CharField(max_length=50)
-#     location = models.CharField(max_length=100)
-#     size = models.FloatField()
-#     plantDate = models.DateField()
-#     cropType = models.ForeignKey(cropType, on_delete=models.PROTECT)
-
-#     def __str__(self):
-#         return self.name
-
-
-# new models
 
 
 class cropPeriod1(models.Model):

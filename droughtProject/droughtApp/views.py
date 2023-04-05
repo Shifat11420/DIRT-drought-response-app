@@ -3,7 +3,6 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-
 from .models import *
 from .serializers import *
 
@@ -12,8 +11,6 @@ from datetime import datetime, timedelta
 from .functionAPI import *
 from .functions import *
 
-
-# AERISweatherAPI
 
 class CropTypes(viewsets.ModelViewSet):
     queryset = cropType.objects.all().order_by('Id')
@@ -32,21 +29,6 @@ class CropTypes2(APIView):
         # croptypes = [crop.crops for crop in cropType.objects.all()]  # crops -> Name (check)
 
         return Response(serializer.data)
-
-
-# class CropType1ViewSet(viewsets.ModelViewSet):
-#     queryset = cropType1.objects.all().order_by('Id')
-#     serializer_class = cropType1Serializer
-
-
-# class CropType12View(APIView):
-#     def get(self, request, format=None):
-
-#         # serialize data
-#         serializer = cropType12Serializer(
-#             cropType1.objects.all(), many=True)
-
-#         return Response(serializer.data)
 
 
 class CropPeriod1ViewSet(viewsets.ModelViewSet):
@@ -92,8 +74,6 @@ class soilMoisture12View(APIView):
             soilMoisture1.objects.all(), many=True)
 
         return Response(serializer.data)
-
-# soil types
 
 
 class SoilTypes(viewsets.ModelViewSet):
@@ -180,6 +160,7 @@ class irrigationActivity2(APIView):
 
 class CalculateDroughtAPIView(APIView):
     def get(self, request, format=None):
+        # Inputs ____________________
         # #Get the User inputs:
         # cropType = "Cotton"
         # soilType = "Sandy loam"
@@ -204,18 +185,19 @@ class CalculateDroughtAPIView(APIView):
         cropCoeff = {"Early": 0.34257447, "Mid": 1.09349127,
                      "Last Irrig. Event": 0.89713052}
 
-        ####################################################################
+        # _________________________________________
         # For planting day
         print("\n\n")
         print("inputs[plantDate] = ", inputs["plantDate"])
         plantingDate = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         print("plantingDate = ", plantingDate)
 
-        # API request
+        # API request_____ from AERISweatherAPI
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
             plantingDate)
         # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-        #########################################################
+
+        # _______________________________________
 
         # Table Queries___________________________
         # ____________________CORP INFO____________________
@@ -229,56 +211,28 @@ class CalculateDroughtAPIView(APIView):
             lengthOfGrowingPeriodQUERY = q['GrowingPeriodDays']
             maxRootDepthQUERY = q['MaxRootDepth']
             maxAlllowableDeplitionQUERY = q['MaxAlllowableDeplition']
-            # columnForKcQUERY = q['KC']
-            # columnForDAPQUERY = q['DAP']
             dAPforMaxRootDepthQUERY = q['MaxRootDepthDAP']
 
         print("for crops _", inputs["cropType"], "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
               "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n",
               "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
-        ##
 
-        # ____________________CORP PERIOD____________________
-        # crop_period = cropPeriod.objects.all()
-        # print("crop_period : \n", crop_period)
-        # cropPeriodSerializerClass = cropPeriodSerializer
-
+        # ____________________CORP PERIOD___________________
         crop_period1 = cropPeriod1.objects.all()
         print("crop_period1 : \n", crop_period1)
         cropPeriod1SerializerClass = cropPeriod1Serializer
 
-        ##
         # ____________________GROWTH STAGE____________________
         growth_stage = growthStage.objects.all()
         print("growth_stage : \n", growth_stage)
         growthStageSerializerClass = growthStageSerializer
-
-        ##
-        # ____________________SOIL CONDITION____________________
-        # soil_condition = soilCondition.objects.all()
-        # print("soil_condition : \n", soil_condition)
-        # soilConditionSerializerClass = soilConditionSerializer
-
-        # soilConditionInfo = soil_condition.filter(
-        #     soilTexture=inputs["soilType"]).values()
-
-        # for q in soilConditionInfo:
-        #     averagePlantAvailableWaterInFtQUERY = q['averagePlantAvailableWaterInFt']
-        #     averagePlantAvailableWaterInInQUERY = q['averagePlantAvailableWaterInIn']
-        #     permanentWiltingPointInInQUERY = q['permanentWiltingPointInIn']
-
-        # print("for soil type _", inputs["soilType"], "_ \n",
-        #       "averagePlantAvailableWaterInFt = ", averagePlantAvailableWaterInFtQUERY, "\n",
-        #       "averagePlantAvailableWaterInInQUERY =", averagePlantAvailableWaterInInQUERY, "\n",
-        #       "permanentWiltingPointInInQUERY = ", permanentWiltingPointInInQUERY)
-        # ##
 
         # ____________________SOIL TYPE____________________
         soilTypeInfoall = soilType.objects.all()
         print("soil type : \n", soilTypeInfoall)
         soilTypeSerializerClass = soilTypeSerializer
 
-        soilTypeInfo = soilType.objects.filter(
+        soilTypeInfo = soilTypeInfoall.filter(
             Name=inputs["soilType"]).values()
 
         for q in soilTypeInfo:
@@ -302,19 +256,6 @@ class CalculateDroughtAPIView(APIView):
         print("hydrogroupName = ", hydrogroupName)
         print("hydrogroupId = ", hydrogroupId)
 
-        # soil_drainage_group = soilDrainageGroup.objects.all()
-        # print("soil_drainage_group  : \n", soil_drainage_group)
-        # soilDrainageGroupSerializerClass = soilDrainageGroupSerializer
-
-        # soilDrainageGroupInfo = soil_drainage_group.filter(
-        #     descriptionForCN=inputs["plantCond"]).values()
-        # print("soilDrainageGroupInfo======", soilDrainageGroupInfo)
-
-        # for q in soilDrainageGroupInfo:
-        #     hydroSoilvalueQUERY = q[str(hydrogroupName)]
-        # print("hydroSoilvalueQUERY = ", hydroSoilvalueQUERY)
-
-        ##
         drainageTypeInfo = drainageType.objects.all()
         print("drainageTypeInfo  : \n", drainageTypeInfo)
         drainageTypeSerializerClass = drainageTypeSerializer
@@ -324,18 +265,6 @@ class CalculateDroughtAPIView(APIView):
         print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
-        # soil_moisture = soilMoisture.objects.all()
-        # print("soil_moisture  : \n", soil_moisture)
-        # soilMoistureSerializerClass = soilMoistureSerializer
-
-        # soilMoistureInfo = soil_moisture.filter(
-        #     initialConditions=inputs["initMoistCond"]).values()
-        # print("soilMoistureInfo = ", soilMoistureInfo)
-        # for q in soilMoistureInfo:
-        #     ratioQUERY = q['ratio']
-        # print("ratioQUERY = ", ratioQUERY)
-
-        ##
         soil_moisture = soilMoisture1.objects.all()
         print("soil_moisture  : \n", soil_moisture)
         soilMoistureSerializerClass = soilMoisture1Serializer
@@ -352,7 +281,7 @@ class CalculateDroughtAPIView(APIView):
         print("unit_conversion  : \n", unit_conversion)
         unitConversionSerializerClass = unitConversionSerializer
 
-        # Calculations_____________________________
+        #  Calculations _____________________________
         planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         # print("inputs[plantDate] = ", inputs["plantDate"])
         # print("type inputs[plantDate] = ", type(inputs["plantDate"]))
@@ -363,7 +292,6 @@ class CalculateDroughtAPIView(APIView):
         date_range = [(planting_date + timedelta(days=i))
                       for i in range(inputs["seasonLength"])]
         days_after_planting = [i for i in range(0, inputs["seasonLength"])]
-        # plant_growth_stage = []
 
         if inputs["maxRootDepth"] == "":
             max_root_depth = maxRootDepthQUERY
@@ -397,23 +325,6 @@ class CalculateDroughtAPIView(APIView):
         refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j), 2)
                         for i, j in zip(field_capacity, perm_wilt_point)]
 
-        #
-        # if inputs["cropType"] == "Corn":
-        #     kc = "kcforCorn"
-        #     dap = "dAPforCorn"
-        # if inputs["cropType"] == "Soybean":
-        #     kc = "kcforSoybean"
-        #     dap = "dAPforSoybean"
-        # if inputs["cropType"] == "Cotton":
-        #     kc = "kcforCotton"
-        #     dap = "dAPforCotton"
-        # if inputs["cropType"] == "Grain Sorghum":
-        #     kc = "kcforGrainSorghum"
-        #     dap = "dAPforSorghum"
-        # if inputs["cropType"] == "Sugarcane":
-        #     kc = "kcforSugarcane"
-        #     dap = "dAPforSugarcane"
-
         # demo is the cropid matched from croptype
         cropIdForType = cropType.objects.filter(
             Name=inputs["cropType"]).values()[0]['Id']
@@ -425,28 +336,11 @@ class CalculateDroughtAPIView(APIView):
 
         print("cropPeriodForId = ", cropPeriodForId)
 
-        ##
-
-        # for item in daps:
-        #     if daps[item] == "":
-        #         daps[item] = list(cropPeriod.objects.all().filter(
-        #             period__icontains=item).values(dap))[0][dap]
-        # print("daps----", daps)
-        #
         for item in daps:
             if daps[item] == "":
                 daps[item] = float(cropPeriodForId.filter(
                     Name=item).values()[0]['DAP'])
         print("daps---", daps)
-        # #
-
-        #
-        # for item in cropCoeff:
-        #     if cropCoeff[item] == "":
-        #         cropCoeff[item] = float(list(cropPeriod.objects.all().filter(
-        #             period__icontains=item).values(dap))[0][kc])
-        # print("cropcoeff----", cropCoeff)
-        # #
 
         for item in cropCoeff:
             if cropCoeff[item] == "":
@@ -462,7 +356,6 @@ class CalculateDroughtAPIView(APIView):
                       )/(daps['Last Irrig. Event'] - daps['Late'])
 
         print(" dev_slope = ", dev_slope, " late_slope = ", late_slope)
-        #
 
         Kc = []
         for coeff in days_after_planting:
@@ -485,7 +378,7 @@ class CalculateDroughtAPIView(APIView):
         ratio = ratioQUERY
         print("ratio =", ratio)
 
-        ####################################################################
+        ############## _________________________________##############
         # Run the calculation
         SWLs = []  # append starting water level
         EWLs = []  # append ending water level
@@ -504,9 +397,7 @@ class CalculateDroughtAPIView(APIView):
 
         #######
         # at planting date, day = 0
-
         day = 0
-
         rain = rainfall_totalIN  # dictRainfall['rainDay0']         #0.01 #API
         print("Rain on planting day = ", rain)
 
@@ -676,7 +567,7 @@ class CalculateDroughtAPIView(APIView):
             rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
                 NextDayDate)
             # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-            ####################################################################
+            ############### ____________________________________#################
 
             # increase day incrementally
             day = dayI
