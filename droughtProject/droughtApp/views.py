@@ -317,6 +317,7 @@ class CalculateDroughtAPIView(APIView):
             print("inputs[fieldCap]", inputs["fieldCap"])
 
         field_capacity = [round(i*inputs["fieldCap"], 2) for i in root_depth]
+
         perm_wilt_point = [round(i*inputs["permWiltPoint"], 2)
                            for i in root_depth]
 

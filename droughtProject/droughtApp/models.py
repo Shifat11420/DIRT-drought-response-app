@@ -82,6 +82,7 @@ class soilType(models.Model):
     Name = models.CharField(max_length=20)
     AveragePlantAvailableWater = models.FloatField(null=True)
     PermanentWiltingPoint = models.FloatField(null=True)
+    FieldCapacity = models.FloatField(null=True)
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
