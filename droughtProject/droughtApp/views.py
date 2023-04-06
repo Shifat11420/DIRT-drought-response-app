@@ -339,13 +339,13 @@ class CalculateDroughtAPIView(APIView):
         for item in daps:
             if daps[item] == "":
                 daps[item] = float(cropPeriodForId.filter(
-                    Name=item).values()[0]['DAP'])
+                    Name=item).values()[0]['DaysAfterPlanting'])
         print("daps---", daps)
 
         for item in cropCoeff:
             if cropCoeff[item] == "":
                 kcValue = cropPeriodForId.filter(
-                    Name=item).values()[0]['KC']
+                    Name=item).values()[0]['CropCoefficient']
                 cropCoeff[item] = float(kcValue) if not (
                     kcValue == "Linear") else kcValue
         print("cropcoeff---", cropCoeff)

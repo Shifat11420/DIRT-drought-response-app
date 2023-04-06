@@ -42,8 +42,8 @@ class cropPeriod1(models.Model):
     Name = models.CharField(max_length=30)
     CropTypeId = models.ForeignKey(
         cropType, on_delete=models.PROTECT, null=True)
-    KC = models.CharField(max_length=30)
-    DAP = models.IntegerField()
+    CropCoefficient = models.CharField(max_length=30)  # CropCoefficient
+    DaysAfterPlanting = models.IntegerField()  # DaysAfterPlanting
 
     def __str__(self):
         return str(self.Id)+" "+self.Name+" "+str(self.CropTypeId)
