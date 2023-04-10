@@ -10,85 +10,37 @@ class cropTypesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class cropTypes2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = cropType
-        fields = '__all__'
-
-
-class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = unitConversion
-        fields = '__all__'
-
-
-class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
+class cropPeriodSerializer(serializers.ModelSerializer):
     class Meta:
         model = cropPeriod
         fields = '__all__'
 
 
-class cropPeriod2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = cropPeriod
-        fields = '__all__'
-
-
-class soilMoistureSerializer(serializers.HyperlinkedModelSerializer):
+class soilMoistureSerializer(serializers.ModelSerializer):
     class Meta:
         model = soilMoisture
         fields = '__all__'
 
 
-class soilMoisture2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = soilMoisture
-        fields = '__all__'
-
-
-class soilTypeSerializer(serializers.HyperlinkedModelSerializer):
+class soilTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = soilType
         fields = '__all__'
 
 
-class soilType2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = soilType
-        fields = '__all__'
-
-
-class drainageTypeSerializer(serializers.HyperlinkedModelSerializer):
+class drainageTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = drainageType
         fields = '__all__'
 
 
-class drainageType2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = drainageType
-        fields = '__all__'
-
-
-class hydrologicGroupSerializer(serializers.HyperlinkedModelSerializer):
+class hydrologicGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = hydrologicGroup
         fields = '__all__'
 
 
-class hydrologicGroup2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = hydrologicGroup
-        fields = '__all__'
-
-
-class userSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = user
-        fields = '__all__'
-
-
-class user2Serializer(serializers.ModelSerializer):
+class userSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
         fields = '__all__'
@@ -100,19 +52,13 @@ class fieldSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class field2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = field
-        fields = '__all__'
-
-
-class irrigationSerializer(serializers.HyperlinkedModelSerializer):
+class irrigationSerializer(serializers.ModelSerializer):
     class Meta:
         model = irrigation
         fields = '__all__'
 
 
-class irrigation2Serializer(serializers.ModelSerializer):
+class unitConversionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = irrigation
+        model = unitConversion
         fields = '__all__'

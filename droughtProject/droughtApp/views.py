@@ -17,33 +17,9 @@ class CropTypes(viewsets.ModelViewSet):
     serializer_class = cropTypesSerializer
 
 
-class CropTypes2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = cropTypes2Serializer(
-            # cropType.objects.all(), many=True, context={'request': request})
-            cropType.objects.all(), many=True)
-
-        # Easy pattern for returning a single field
-        # croptypes = [crop.crops for crop in cropType.objects.all()]  # crops -> Name (check)
-
-        return Response(serializer.data)
-
-
 class cropPeriodViewSet(viewsets.ModelViewSet):
     queryset = cropPeriod.objects.all().order_by('Id')
-    serializer_class = cropPeriod2Serializer
-
-
-class cropPeriod2View(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = cropPeriod2Serializer(
-            cropPeriod.objects.all(), many=True)
-
-        return Response(serializer.data)
+    serializer_class = cropPeriodSerializer
 
 
 class drainageTypeViewSet(viewsets.ModelViewSet):
@@ -51,59 +27,19 @@ class drainageTypeViewSet(viewsets.ModelViewSet):
     serializer_class = drainageTypeSerializer
 
 
-class drainageType2View(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = drainageType2Serializer(
-            drainageType.objects.all(), many=True)
-
-        return Response(serializer.data)
-
-
 class soilMoistureViewSet(viewsets.ModelViewSet):
     queryset = soilMoisture.objects.all().order_by('Id')
     serializer_class = soilMoistureSerializer
 
 
-class soilMoisture2View(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = soilMoisture2Serializer(
-            soilMoisture.objects.all(), many=True)
-
-        return Response(serializer.data)
-
-
 class SoilTypes(viewsets.ModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
-    serializer_class = soilType2Serializer
-
-
-class SoilTypes2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = soilType2Serializer(
-            soilType.objects.all(), many=True)
-
-        return Response(serializer.data)
+    serializer_class = soilTypeSerializer
 
 
 class hydrologicGroups(viewsets.ModelViewSet):
     queryset = hydrologicGroup.objects.all().order_by('Id')
-    serializer_class = hydrologicGroup2Serializer
-
-
-class hydrologicGroups2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = hydrologicGroupSerializer(
-            hydrologicGroup.objects.all(), many=True, context={'request': request})
-
-        return Response(serializer.data)
+    serializer_class = hydrologicGroupSerializer
 
 
 class userInfo(viewsets.ModelViewSet):
@@ -111,47 +47,14 @@ class userInfo(viewsets.ModelViewSet):
     serializer_class = userSerializer
 
 
-class userInfo2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = user2Serializer(
-            user.objects.all(), many=True)
-        return Response(serializer.data)
-
-
 class userfield(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
 
 
-class userfield2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = field2Serializer(
-            field.objects.all(), many=True)
-        return Response(serializer.data)
-
-    def post(request):
-        serializer = field2Serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-
 class irrigationActivity(viewsets.ModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
-
-
-class irrigationActivity2(APIView):
-    def get(self, request, format=None):
-
-        # serialize data
-        serializer = irrigation2Serializer(
-            irrigation.objects.all(), many=True)
-        return Response(serializer.data)
 
 
 # drought calculator
@@ -256,7 +159,7 @@ class CalculateDroughtAPIView(APIView):
         drainageTypeSerializerClass = drainageTypeSerializer
 
         soildrainageTypeValue = drainageTypeInfo.filter(
-            Name=inputs["plantCond"], HydrologicGroupTypeId=hydrogroupId).values()[0]['ValueField']
+            Name=inputs["plantCond"], HydrologicGroupId=hydrogroupId).values()[0]['DrainageValue']
         print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
@@ -268,8 +171,8 @@ class CalculateDroughtAPIView(APIView):
             Name=inputs["initMoistCond"]).values()
         print("soilMoistureInfo = ", soilMoistureInfo)
         for q in soilMoistureInfo:
-            ratioQUERY = q['Ratio']
-        print("ratioQUERY = ", ratioQUERY)
+            ratio = q['Ratio']
+        print("ratio = ", ratio)
 
         # ____________________UNIT CONVERSION____________________
         unit_conversion = unitConversion.objects.all()
@@ -370,9 +273,6 @@ class CalculateDroughtAPIView(APIView):
         storage = (1000/soildrainageTypeValue) - 10
         print("inputs[plantCond] = ", inputs["plantCond"],
               "inputs[hydroSoilGrp] = ", inputs["hydroSoilGrp"], "storage =", storage)
-
-        ratio = ratioQUERY
-        print("ratio =", ratio)
 
         ############## _________________________________##############
         # Run the calculation

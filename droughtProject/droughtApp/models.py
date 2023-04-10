@@ -62,7 +62,7 @@ class drainageType(models.Model):
     DrainageValue = models.IntegerField()
 
     def __str__(self):
-        return str(self.Id)+" "+self.Name+" "+str(self.HydrologicGroupTypeId)
+        return str(self.Id)+" "+self.Name+" "+str(self.HydrologicGroupId)
 
 
 class soilType(models.Model):
@@ -93,10 +93,11 @@ class field(models.Model):
     Latitude = models.DecimalField(max_digits=8, decimal_places=6)
     Longitude = models.DecimalField(max_digits=9, decimal_places=6)
     Acreage = models.IntegerField()
+    Elevation = models.FloatField(null=True)
     CropTypeId = models.ForeignKey(
         cropType, on_delete=models.PROTECT, blank=True, null=True)
     PlantDate = models.DateField()
-    HydrologicGroupTypeId = models.ForeignKey(
+    HydrologicGroupId = models.ForeignKey(
         hydrologicGroup, on_delete=models.PROTECT)
     DrainageTypeId = models.ForeignKey(
         drainageType, on_delete=models.PROTECT, null=True)
