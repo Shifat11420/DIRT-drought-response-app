@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(3rbwskk%g#c5s(@%&1&r2pe*r+k**+2izq4h=+s2q-$1g4s)0
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost",
-                 "droughtresponse-api-dev.azurewebsites.net"]
+                 "droughtresponseapi-dev.azurewebsites.net"]
 
 
 # Application definition
