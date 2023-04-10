@@ -1,46 +1,158 @@
-#from urllib import response
 from django.shortcuts import render
 from rest_framework import viewsets
-from droughtApp.serializers import testmodelSerializer, cropInfoSerializer, cropInfo2Serializer, cropPeriodSerializer, growthStageSerializer, soilConditionSerializer, soilMoistureSerializer, soilDrainageGroupSerializer, unitConversionSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from .models import testdatamodel, cropInfo, cropPeriod, growthStage, soilMoisture, soilCondition, soilDrainageGroup, unitConversion
+from .models import *
+from .serializers import *
+
 # drought calculator imports
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-from droughtApp.functions import *
-from droughtApp.functionAPI import *
-# AERISweatherAPI
-import requests
-import json
-from jsonpath_ng import jsonpath, parse
+from datetime import datetime, timedelta, date
+from .functionAPI import *
+from .functions import *
 
 
-class testmodelViewSet(viewsets.ModelViewSet):
-    queryset = testdatamodel.objects.all().order_by('id')
-    serializer_class = testmodelSerializer
-
-
-# crop types
 class CropTypes(viewsets.ModelViewSet):
-    queryset = cropInfo.objects.all().order_by('crops')
-    serializer_class = cropInfoSerializer
+    queryset = cropType.objects.all().order_by('Id')
+    serializer_class = cropTypesSerializer
 
 
 class CropTypes2(APIView):
     def get(self, request, format=None):
 
         # serialize data
-        serializer = cropInfo2Serializer(
-            # cropInfo.objects.all(), many=True, context={'request': request})
-            cropInfo.objects.all(), many=True)
+        serializer = cropTypes2Serializer(
+            # cropType.objects.all(), many=True, context={'request': request})
+            cropType.objects.all(), many=True)
 
         # Easy pattern for returning a single field
-        # croptypes = [crop.crops for crop in cropInfo.objects.all()]
+        # croptypes = [crop.crops for crop in cropType.objects.all()]  # crops -> Name (check)
 
         return Response(serializer.data)
+
+
+class cropPeriodViewSet(viewsets.ModelViewSet):
+    queryset = cropPeriod.objects.all().order_by('Id')
+    serializer_class = cropPeriod2Serializer
+
+
+class cropPeriod2View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = cropPeriod2Serializer(
+            cropPeriod.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class drainageTypeViewSet(viewsets.ModelViewSet):
+    queryset = drainageType.objects.all().order_by('Id')
+    serializer_class = drainageTypeSerializer
+
+
+class drainageType2View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = drainageType2Serializer(
+            drainageType.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class soilMoistureViewSet(viewsets.ModelViewSet):
+    queryset = soilMoisture.objects.all().order_by('Id')
+    serializer_class = soilMoistureSerializer
+
+
+class soilMoisture2View(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = soilMoisture2Serializer(
+            soilMoisture.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class SoilTypes(viewsets.ModelViewSet):
+    queryset = soilType.objects.all().order_by('Name')
+    serializer_class = soilType2Serializer
+
+
+class SoilTypes2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = soilType2Serializer(
+            soilType.objects.all(), many=True)
+
+        return Response(serializer.data)
+
+
+class hydrologicGroups(viewsets.ModelViewSet):
+    queryset = hydrologicGroup.objects.all().order_by('Id')
+    serializer_class = hydrologicGroup2Serializer
+
+
+class hydrologicGroups2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = hydrologicGroupSerializer(
+            hydrologicGroup.objects.all(), many=True, context={'request': request})
+
+        return Response(serializer.data)
+
+
+class userInfo(viewsets.ModelViewSet):
+    queryset = user.objects.all().order_by('Id')
+    serializer_class = userSerializer
+
+
+class userInfo2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = user2Serializer(
+            user.objects.all(), many=True)
+        return Response(serializer.data)
+
+
+class userfield(viewsets.ModelViewSet):
+    queryset = field.objects.all().order_by('Id')
+    serializer_class = fieldSerializer
+
+
+class userfield2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = field2Serializer(
+            field.objects.all(), many=True)
+        return Response(serializer.data)
+
+    def post(request):
+        serializer = field2Serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class irrigationActivity(viewsets.ModelViewSet):
+    queryset = irrigation.objects.all().order_by('Id')
+    serializer_class = irrigationSerializer
+
+
+class irrigationActivity2(APIView):
+    def get(self, request, format=None):
+
+        # serialize data
+        serializer = irrigation2Serializer(
+            irrigation.objects.all(), many=True)
+        return Response(serializer.data)
+
 
 # drought calculator
 ####################################################################
@@ -48,6 +160,7 @@ class CropTypes2(APIView):
 
 class CalculateDroughtAPIView(APIView):
     def get(self, request, format=None):
+        # Inputs ____________________
         # #Get the User inputs:
         # cropType = "Cotton"
         # soilType = "Sandy loam"
@@ -72,93 +185,79 @@ class CalculateDroughtAPIView(APIView):
         cropCoeff = {"Early": 0.34257447, "Mid": 1.09349127,
                      "Last Irrig. Event": 0.89713052}
 
-        ####################################################################
+        # _________________________________________
         # For planting day
         print("\n\n")
         print("inputs[plantDate] = ", inputs["plantDate"])
         plantingDate = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         print("plantingDate = ", plantingDate)
-        print(cropInfo.objects.all())
-        # API request
+
+        # API request_____ from AERISweatherAPI
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
             plantingDate)
-        #print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-        #########################################################
+        # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
 
-        # Calculations
+        # _______________________________________
+
+        # Table Queries___________________________
         # ____________________CORP INFO____________________
-        crop_info = cropInfo.objects.all()
-        print("crop_info : \n", crop_info)
-        cropInfoSerializerClass = cropInfoSerializer
+        croptype = cropType.objects.all()
+        print("croptype : \n", croptype)
+        cropTypeSerializerClass = cropTypesSerializer
 
-        queryCropInfo = crop_info.filter(crops=inputs["cropType"]).values()
+        queryCropType = croptype.filter(Name=inputs["cropType"]).values()
 
-        for q in queryCropInfo:
-            lengthOfGrowingPeriodQUERY = q['lengthOfGrowingPeriodDays']
-            maxRootDepthQUERY = q['maxRootDepthInches']
-            maxAlllowableDeplitionQUERY = q['maxAlllowableDeplitionPercentage']
-            columnForKcQUERY = q['columnForKc']
-            columnForDAPQUERY = q['columnForDAP']
-            dAPforMaxRootDepthQUERY = q['dAPforMaxRootDepth']
+        for q in queryCropType:
+            lengthOfGrowingPeriodQUERY = q['GrowingPeriodDays']
+            maxRootDepthQUERY = q['MaxRootDepth']
+            maxAlllowableDeplitionQUERY = q['MaxAlllowableDeplition']
+            dAPforMaxRootDepthQUERY = q['MaxRootDepthDAP']
 
-        # print("for crops _",inputs["cropType"],"_ \n","length Of Growing Period Days = ",lengthOfGrowingPeriodQUERY,"\n", "maxRootDepthQUERY=", maxRootDepthQUERY,"\n",
-        # "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY,"\n", "columnForKcQUERY =", columnForKcQUERY ,"\n", "columnForDAPQUERY= ", columnForDAPQUERY,"\n",
-        # "dAPforMaxRootDepthQUERY =",dAPforMaxRootDepthQUERY )
+        print("for crops _", inputs["cropType"], "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
+              "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n",
+              "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
 
-        ##
-
-        # ____________________CORP PERIOD____________________
-        crop_period = cropPeriod.objects.all()
-        print("crop_period : \n", crop_period)
+        # ____________________CORP PERIOD___________________
+        crop_period1 = cropPeriod.objects.all()
+        print("crop_period1 : \n", crop_period1)
         cropPeriodSerializerClass = cropPeriodSerializer
 
-        ##
-        # ____________________GROWTH STAGE____________________
-        growth_stage = growthStage.objects.all()
-        print("growth_stage : \n", growth_stage)
-        growthStageSerializerClass = growthStageSerializer
+        # ____________________SOIL TYPE____________________
+        soilTypeInfoall = soilType.objects.all()
+        print("soil type : \n", soilTypeInfoall)
+        soilTypeSerializerClass = soilTypeSerializer
 
-        ##
-        # ____________________SOIL CONDITION____________________
-        soil_condition = soilCondition.objects.all()
-        print("soil_condition : \n", soil_condition)
-        soilConditionSerializerClass = soilConditionSerializer
+        soilTypeInfo = soilTypeInfoall.filter(
+            Name=inputs["soilType"]).values()
 
-        soilConditionInfo = soil_condition.filter(
-            soilTexture=inputs["soilType"]).values()
-        for q in soilConditionInfo:
-            averagePlantAvailableWaterInFtQUERY = q['averagePlantAvailableWaterInFt']
-            averagePlantAvailableWaterInInQUERY = q['averagePlantAvailableWaterInIn']
-            permanentWiltingPointInInQUERY = q['permanentWiltingPointInIn']
+        for q in soilTypeInfo:
+            averagePlantAvailableWaterQUERY = q['AveragePlantAvailableWater']
+            permanentWiltingPointQUERY = q['PermanentWiltingPoint']
 
-        # print("for soil type _",inputs["soilType"],"_ \n",
-        # "averagePlantAvailableWaterInFt = ",averagePlantAvailableWaterInFtQUERY,"\n",
-        # "averagePlantAvailableWaterInInQUERY =", averagePlantAvailableWaterInInQUERY ,"\n",
-        # "permanentWiltingPointInInQUERY = ", permanentWiltingPointInInQUERY)
-        ##
+        print("for soil type _", inputs["soilType"], "_ \n",
+              "averagePlantAvailableWaterQUERY =", averagePlantAvailableWaterQUERY, "\n",
+              "permanentWiltingPointQUERY = ", permanentWiltingPointQUERY)
 
-        # ____________________SOIL DRAINAGE GROUP____________________
-        soil_drainage_group = soilDrainageGroup.objects.all()
-        print("soil_drainage_group  : \n", soil_drainage_group)
-        soilDrainageGroupSerializerClass = soilDrainageGroupSerializer
+        # ____________________SOIL DRAINAGE GROUP and HYDROLOGIC GROUP____________________
 
-        soilDrainageGroupInfo = soil_drainage_group.filter(
-            descriptionForCN=inputs["plantCond"]).values()
-        print("soilDrainageGroupInfo======", soilDrainageGroupInfo)
-        for q in soilDrainageGroupInfo:
-            aQUERY = q['a']
-            bQUERY = q['b']
-            cQUERY = q['c']
-            dQUERY = q['d']
+        hydrogrpQUERY = hydrologicGroup.objects.filter(
+            Name=inputs["hydroSoilGrp"]).values()[0]['Name']
+        print("hydrogrpQUERY = ", hydrogrpQUERY)
 
-        if inputs["hydroSoilGrp"] == "A":
-            hydroSoilvalueQUERY = aQUERY
-        if inputs["hydroSoilGrp"] == "B":
-            hydroSoilvalueQUERY = bQUERY
-        if inputs["hydroSoilGrp"] == "C":
-            hydroSoilvalueQUERY = cQUERY
-        if inputs["hydroSoilGrp"] == "D":
-            hydroSoilvalueQUERY = dQUERY
+        hydrogrpQUERY = hydrologicGroup.objects.filter(
+            Name=inputs["hydroSoilGrp"]).values()[0]
+        hydrogroupName = hydrogrpQUERY['Name']
+        hydrogroupId = hydrogrpQUERY['Id']
+        print("hydrogroupName = ", hydrogroupName)
+        print("hydrogroupId = ", hydrogroupId)
+
+        drainageTypeInfo = drainageType.objects.all()
+        print("drainageTypeInfo  : \n", drainageTypeInfo)
+        drainageTypeSerializerClass = drainageTypeSerializer
+
+        soildrainageTypeValue = drainageTypeInfo.filter(
+            Name=inputs["plantCond"], HydrologicGroupTypeId=hydrogroupId).values()[0]['ValueField']
+        print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
         soil_moisture = soilMoisture.objects.all()
@@ -166,15 +265,18 @@ class CalculateDroughtAPIView(APIView):
         soilMoistureSerializerClass = soilMoistureSerializer
 
         soilMoistureInfo = soil_moisture.filter(
-            initialConditions=inputs["initMoistCond"]).values()
+            Name=inputs["initMoistCond"]).values()
+        print("soilMoistureInfo = ", soilMoistureInfo)
         for q in soilMoistureInfo:
-            ratioQUERY = q['ratio']
+            ratioQUERY = q['Ratio']
+        print("ratioQUERY = ", ratioQUERY)
 
         # ____________________UNIT CONVERSION____________________
         unit_conversion = unitConversion.objects.all()
         print("unit_conversion  : \n", unit_conversion)
         unitConversionSerializerClass = unitConversionSerializer
 
+        #  Calculations _____________________________
         planting_date = datetime.strptime(inputs["plantDate"], "%m/%d/%Y")
         # print("inputs[plantDate] = ", inputs["plantDate"])
         # print("type inputs[plantDate] = ", type(inputs["plantDate"]))
@@ -185,7 +287,6 @@ class CalculateDroughtAPIView(APIView):
         date_range = [(planting_date + timedelta(days=i))
                       for i in range(inputs["seasonLength"])]
         days_after_planting = [i for i in range(0, inputs["seasonLength"])]
-        #plant_growth_stage = []
 
         if inputs["maxRootDepth"] == "":
             max_root_depth = maxRootDepthQUERY
@@ -202,15 +303,16 @@ class CalculateDroughtAPIView(APIView):
                 root_depth.append(max_root_depth)
 
         if inputs["permWiltPoint"] == "":
-            inputs["permWiltPoint"] = permanentWiltingPointInInQUERY
+            inputs["permWiltPoint"] = permanentWiltingPointQUERY
             print("inputs[permWiltPoint]", inputs["permWiltPoint"])
 
         if inputs["fieldCap"] == "":
             inputs["fieldCap"] = inputs["permWiltPoint"] + \
-                averagePlantAvailableWaterInInQUERY
+                averagePlantAvailableWaterQUERY
             print("inputs[fieldCap]", inputs["fieldCap"])
 
         field_capacity = [round(i*inputs["fieldCap"], 2) for i in root_depth]
+
         perm_wilt_point = [round(i*inputs["permWiltPoint"], 2)
                            for i in root_depth]
 
@@ -219,40 +321,37 @@ class CalculateDroughtAPIView(APIView):
         refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j), 2)
                         for i, j in zip(field_capacity, perm_wilt_point)]
 
-        #
-        if inputs["cropType"] == "Corn":
-            kc = "kcforCorn"
-            dap = "dAPforCorn"
-        if inputs["cropType"] == "Soybean":
-            kc = "kcforSoybean"
-            dap = "dAPforSoybean"
-        if inputs["cropType"] == "Cotton":
-            kc = "kcforCotton"
-            dap = "dAPforCotton"
-        if inputs["cropType"] == "Grain Sorghum":
-            kc = "kcforGrainSorghum"
-            dap = "dAPforSorghum"
-        if inputs["cropType"] == "Sugarcane":
-            kc = "kcforSugarcane"
-            dap = "dAPforSugarcane"
-        #
+        # demo is the cropid matched from croptype
+        cropIdForType = cropType.objects.filter(
+            Name=inputs["cropType"]).values()[0]['Id']
+        print("cropIdForType = ", cropIdForType)
+
+        # cropPeriodForId is filtered for the cropId from cropPeriod
+        cropPeriodForId = cropPeriod.objects.filter(
+            CropTypeId=cropIdForType).all()
+
+        print("cropPeriodForId = ", cropPeriodForId)
 
         for item in daps:
             if daps[item] == "":
-                daps[item] = list(cropPeriod.objects.all().filter(
-                    period__icontains=item).values(dap))[0][dap]
-        print("daps----", daps)
+                daps[item] = float(cropPeriodForId.filter(
+                    Name=item).values()[0]['DaysAfterPlanting'])
+        print("daps---", daps)
 
         for item in cropCoeff:
             if cropCoeff[item] == "":
-                cropCoeff[item] = float(list(cropPeriod.objects.all().filter(
-                    period__icontains=item).values(dap))[0][kc])
-        print("cropcoeff----", cropCoeff)
+                kcValue = cropPeriodForId.filter(
+                    Name=item).values()[0]['CropCoefficient']
+                cropCoeff[item] = float(kcValue) if not (
+                    kcValue == "Linear") else kcValue
+        print("cropcoeff---", cropCoeff)
 
         dev_slope = (cropCoeff['Mid'] - cropCoeff['Early']
                      )/(daps['Mid'] - daps['Development'])
         late_slope = (cropCoeff['Last Irrig. Event'] - cropCoeff['Mid']
                       )/(daps['Last Irrig. Event'] - daps['Late'])
+
+        print(" dev_slope = ", dev_slope, " late_slope = ", late_slope)
 
         Kc = []
         for coeff in days_after_planting:
@@ -268,14 +367,14 @@ class CalculateDroughtAPIView(APIView):
             else:
                 Kc.append(cropCoeff['Last Irrig. Event'])
 
-        storage = (1000/hydroSoilvalueQUERY) - 10
+        storage = (1000/soildrainageTypeValue) - 10
         print("inputs[plantCond] = ", inputs["plantCond"],
               "inputs[hydroSoilGrp] = ", inputs["hydroSoilGrp"], "storage =", storage)
 
         ratio = ratioQUERY
         print("ratio =", ratio)
 
-        ####################################################################
+        ############## _________________________________##############
         # Run the calculation
         SWLs = []  # append starting water level
         EWLs = []  # append ending water level
@@ -294,20 +393,18 @@ class CalculateDroughtAPIView(APIView):
 
         #######
         # at planting date, day = 0
-
         day = 0
-
         rain = rainfall_totalIN  # dictRainfall['rainDay0']         #0.01 #API
         print("Rain on planting day = ", rain)
 
         # julian day
-        #J0 = int(format(planting_date, '%j'))
+        # J0 = int(format(planting_date, '%j'))
         tt = planting_date.timetuple()
         J0 = tt.tm_yday
         print("J0 = ", J0)
 
         # all other values will come from API
-        #ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
+        # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
 
         ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
                               maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
@@ -364,129 +461,187 @@ class CalculateDroughtAPIView(APIView):
         grossIrrg.append(grossIrrigation)
         rainFall.append(rainfall_totalIN)
 
-        #######
+        # #### ---------------here just current day results -----------####
+        # #######
+        # """"""
 
-        # For next day to the planting day
-        print("\n\n")
-        NextDayDate = plantingDate + timedelta(days=1)
-        #NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
-        print("NextDay Date : ", NextDayDate)
+        # # For next day to the planting day
+        # print("\n\n")
+        # NextDayDate = plantingDate + timedelta(days=5)
+        # # NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
+        # print("NextDay Date : ", NextDayDate)
 
-        # API request
-        rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-            NextDayDate)
-        #print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-        ####################################################################
+        # # API request
+        # rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
+        #     NextDayDate)
+        # # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+        # ####################################################################
 
-        # increase day incrementally
-        day = 1
-        rain = rainfall_totalIN  # API
-        print("Rain on day 1 = ", rain)
+        # # increase day incrementally
+        # day = 1
+        # rain = rainfall_totalIN  # API
+        # print("Rain on day 1 = ", rain)
 
-        # ET
-        J = J0+day
-        # all other values will come from API
-        ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
-                              maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
-        # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
-        print("ET0 : ", ET0)
+        # # ET
+        # J = J0+day
+        # # all other values will come from API
+        # ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
+        #                       maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
+        # # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
+        # print("ET0 : ", ET0)
 
-        # if farmer provides irrigation value for a day
-        grossIrrigation = 0  # farmer override
-        grossIrrigUnit = "Acre-inch"  # dropdown if farmer provides a value in grossIrrigation
+        # # if farmer provides irrigation value for a day
+        # grossIrrigation = 0  # farmer override
+        # grossIrrigUnit = "Acre-inch"  # dropdown if farmer provides a value in grossIrrigation
 
-        unitConversionInfo = unit_conversion.filter(
-            flowMeterReadings=grossIrrigUnit).values()
-        for q in unitConversionInfo:
-            conversionQUERY = q['conversion']
-        grossIrrigFactor = conversionQUERY
-        print("grossIrrigFactor = ", grossIrrigFactor)
+        # unitConversionInfo = unit_conversion.filter(
+        #     flowMeterReadings=grossIrrigUnit).values()
+        # for q in unitConversionInfo:
+        #     conversionQUERY = q['conversion']
+        # grossIrrigFactor = conversionQUERY
+        # print("grossIrrigFactor = ", grossIrrigFactor)
 
-        gross_irrig_inch = grossIrrigation * grossIrrigFactor
-        FC_growthday = field_capacity[day]
-        MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
-        pwp_growthday = perm_wilt_point[day]
+        # gross_irrig_inch = grossIrrigation * grossIrrigFactor
+        # FC_growthday = field_capacity[day]
+        # MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
+        # pwp_growthday = perm_wilt_point[day]
 
-        #########
-        swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], inputs["fieldCap"],
-                                                                 refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
+        # #########
+        # swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], inputs["fieldCap"],
+        #                                                          refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
 
-        if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
-            (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
-            (day < daps['Development'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
-                (field_capacity[day]-swl > 3 and day >= daps['Development'] and day < daps['Last Irrig. Event'])) and (field_capacity[day]-swl > 1)):
-            eff_irrigation = field_capacity[day] - swl
-        else:
-            eff_irrigation = 0
+        # if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
+        #     (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
+        #     (day < daps['Development'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
+        #         (field_capacity[day]-swl > 3 and day >= daps['Development'] and day < daps['Last Irrig. Event'])) and (field_capacity[day]-swl > 1)):
+        #     eff_irrigation = field_capacity[day] - swl
+        # else:
+        #     eff_irrigation = 0
 
-        if gross_irrig_inch > 0:
-            irrigation_eff = eff_irrigation/gross_irrig_inch
-        else:
-            irrigation_eff = "nan"  # np.nan
-        ###############
+        # if gross_irrig_inch > 0:
+        #     irrigation_eff = eff_irrigation/gross_irrig_inch
+        # else:
+        #     irrigation_eff = "nan"  # np.nan
+        # ###############
 
-        water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
+        # water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
 
-        SWLs.append(swl)
-        EWLs.append(ewl)
-        DPs.append(dp)
-        SRs.append(sr)
-        VWCs.append(vwc)
-        effIrrig.append(eff_irrigation)
-        irrigEffic.append(irrigation_eff)
-        forDate.append(NextDayDate.strftime('%m/%d/%Y'))
-        FC.append(FC_growthday)
-        MADg.append(MADforgraph)
-        waterDeficit.append(water_Deficit)
-        pwp.append(pwp_growthday)
-        grossIrrg.append(grossIrrigation)
-        rainFall.append(rainfall_totalIN)
+        # SWLs.append(swl)
+        # EWLs.append(ewl)
+        # DPs.append(dp)
+        # SRs.append(sr)
+        # VWCs.append(vwc)
+        # effIrrig.append(eff_irrigation)
+        # irrigEffic.append(irrigation_eff)
+        # forDate.append(NextDayDate.strftime('%m/%d/%Y'))
+        # FC.append(FC_growthday)
+        # MADg.append(MADforgraph)
+        # waterDeficit.append(water_Deficit)
+        # pwp.append(pwp_growthday)
+        # grossIrrg.append(grossIrrigation)
+        # rainFall.append(rainfall_totalIN)
 
         # #-----------------------FOR LOOP-------------------------------------------------------------------------------------
+
+        print("---  here code for loop starts  ---")
+        print("\n\n")
         # #######
         # #increase day incrementally
-        # day= 5
+        dateplanted = plantingDate.strftime('%m/%d/%Y')
+        print("planting Date = ", dateplanted)
+
+        today = date.today()
+        todaydate = today.strftime("%m/%d/%Y")
+        print("today's date =", todaydate)
+
+        date_format = "%m/%d/%Y"
+        a = datetime.strptime(dateplanted, date_format)
+        b = datetime.strptime(todaydate, date_format)
+
+        delta = b - a
+        totaldays = delta.days
+
+        print("totaldays = ", totaldays)
+
         # rain = 0        #API
 
-        # for dayI in range(1,day+1):
+        for dayI in range(1, totaldays+1):  # starts the day after planting day
 
-        #     #ET
-        #     J = J0+dayI
-        #     #all other values will come from API
-        #     ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
-        #     print("ET0 : ", ET0)
+            # For next day to the planting day
 
-        #     #if farmer provides irrigation value for a day
-        #     grossIrrigation = 0    #farmer override
-        #     grossIrrigUnit = "Acre-inch"  #dropdown if farmer provides a value in grossIrrigation
-        #     grossIrrigFactor = unit_conversion.loc[grossIrrigUnit,"Conversion"]
-        #     gross_irrig_inch = grossIrrigation * grossIrrigFactor
+            NextDayDate = plantingDate + timedelta(days=dayI)
+            # NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
+            print("NextDay Date : ", NextDayDate)
 
-        #     #########
-        #     swl,crop_et,eff_rainfall, sr, dp,ewl,vwc = growthDay(ET0,rain,EWLs[dayI-1],root_depth[dayI-1],root_depth[dayI],field_capacity[dayI],fieldCap,
-        #                                                                 refill_point[dayI],perm_wilt_point[dayI],Kc[dayI],storage,gross_irrig_inch=0)
+            # API request
+            rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
+                NextDayDate)
+            # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+            ############### ____________________________________#################
 
-        #     if (((swl-crop_et+eff_rainfall<refill_point[dayI] and dayI>=daps['Development'] and dayI<daps['Last Irrig. Event']) or
-        #         (dayI>=daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall<1.25*perm_wilt_point[dayI]) or
-        #         (dayI<daps['Development'] and swl-crop_et+eff_rainfall<1.25*perm_wilt_point[dayI]) or
-        #         (field_capacity[dayI]-swl>3 and dayI>=daps['Development'] and dayI<daps['Last Irrig. Event'])) and(field_capacity[dayI]-swl>1)):
-        #         eff_irrigation = field_capacity[dayI]- swl
-        #     else:
-        #         eff_irrigation = 0
+            # increase day incrementally
+            day = dayI
+            rain = rainfall_totalIN  # API
+            print("Rain on day ", dayI, " = ", rain)
 
-        #     if gross_irrig_inch>0:
-        #         irrigation_eff =  eff_irrigation/gross_irrig_inch
-        #     else:
-        #         irrigation_eff = np.nan
-        #     ###############
+            # ET
+            J = J0+day
+            # all other values will come from API
+            ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
+                                  maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
+            # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
+            print("ET0 : ", ET0)
 
-        #     SWLs.append(swl)
-        #     EWLs.append(ewl)
-        #     DPs.append(dp)
-        #     SRs.append(sr)
-        #     VWCs.append(vwc)
-        #     effIrrig.append(eff_irrigation)
-        #     irrigEffic.append(irrigation_eff)
+            # if farmer provides irrigation value for a day
+            grossIrrigation = 0  # farmer override
+            grossIrrigUnit = "Acre-inch"  # dropdown if farmer provides a value in grossIrrigation
+
+            unitConversionInfo = unit_conversion.filter(
+                flowMeterReadings=grossIrrigUnit).values()
+            for q in unitConversionInfo:
+                conversionQUERY = q['conversion']
+            grossIrrigFactor = conversionQUERY
+            print("grossIrrigFactor = ", grossIrrigFactor)
+
+            gross_irrig_inch = grossIrrigation * grossIrrigFactor
+            FC_growthday = field_capacity[day]
+            MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
+            pwp_growthday = perm_wilt_point[day]
+
+            #########
+            swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], inputs["fieldCap"],
+                                                                     refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
+
+            if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
+                (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
+                (day < daps['Development'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
+                    (field_capacity[day]-swl > 3 and day >= daps['Development'] and day < daps['Last Irrig. Event'])) and (field_capacity[day]-swl > 1)):
+                eff_irrigation = field_capacity[day] - swl
+            else:
+                eff_irrigation = 0
+
+            if gross_irrig_inch > 0:
+                irrigation_eff = eff_irrigation/gross_irrig_inch
+            else:
+                irrigation_eff = "nan"  # np.nan
+            ###############
+
+            water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
+
+            SWLs.append(swl)
+            EWLs.append(ewl)
+            DPs.append(dp)
+            SRs.append(sr)
+            VWCs.append(vwc)
+            effIrrig.append(eff_irrigation)
+            irrigEffic.append(irrigation_eff)
+            forDate.append(NextDayDate.strftime('%m/%d/%Y'))
+            FC.append(FC_growthday)
+            MADg.append(MADforgraph)
+            waterDeficit.append(water_Deficit)
+            pwp.append(pwp_growthday)
+            grossIrrg.append(grossIrrigation)
+            rainFall.append(rainfall_totalIN)
 
         print("SWLs : ", SWLs)
         print("EWLs : ", EWLs)
