@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from .models import *
 from .serializers import *
+from django_filters.rest_framework import DjangoFilterBackend
 
 # drought calculator imports
 from datetime import datetime, timedelta, date
@@ -25,6 +26,8 @@ class cropPeriodViewSet(viewsets.ModelViewSet):
 class drainageTypeViewSet(viewsets.ModelViewSet):
     queryset = drainageType.objects.all().order_by('Id')
     serializer_class = drainageTypeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['HydrologicGroupId']
 
 
 class soilMoistureViewSet(viewsets.ModelViewSet):
