@@ -159,7 +159,7 @@ class CalculateDroughtAPIView(APIView):
         drainageTypeSerializerClass = drainageTypeSerializer
 
         soildrainageTypeValue = drainageTypeInfo.filter(
-            Name=inputs["plantCond"], HydrologicGroupId=hydrogroupId).values()[0]['ValueField']
+            Name=inputs["plantCond"], HydrologicGroupId=hydrogroupId).values()[0]['DrainageValue']
         print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
