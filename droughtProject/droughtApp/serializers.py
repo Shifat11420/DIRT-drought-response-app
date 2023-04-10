@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import growthStage, unitConversion
+from .models import unitConversion
 from .models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from .models import cropPeriod1, soilMoisture1, drainageType
+from .models import cropPeriod, soilMoisture, drainageType
 
 
-class cropTypesSerializer(serializers.HyperlinkedModelSerializer):
+class cropTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = cropType
         fields = '__all__'
@@ -16,39 +16,33 @@ class cropTypes2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class growthStageSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = growthStage
-        fields = '__all__'
-
-
 class unitConversionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = unitConversion
         fields = '__all__'
 
 
-class cropPeriod1Serializer(serializers.HyperlinkedModelSerializer):
+class cropPeriodSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = cropPeriod1
+        model = cropPeriod
         fields = '__all__'
 
 
-class cropPeriod12Serializer(serializers.ModelSerializer):
+class cropPeriod2Serializer(serializers.ModelSerializer):
     class Meta:
-        model = cropPeriod1
+        model = cropPeriod
         fields = '__all__'
 
 
-class soilMoisture1Serializer(serializers.HyperlinkedModelSerializer):
+class soilMoistureSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = soilMoisture1
+        model = soilMoisture
         fields = '__all__'
 
 
-class soilMoisture12Serializer(serializers.ModelSerializer):
+class soilMoisture2Serializer(serializers.ModelSerializer):
     class Meta:
-        model = soilMoisture1
+        model = soilMoisture
         fields = '__all__'
 
 
@@ -100,7 +94,7 @@ class user2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class fieldSerializer(serializers.HyperlinkedModelSerializer):
+class fieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = field
         fields = '__all__'

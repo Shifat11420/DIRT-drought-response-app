@@ -31,17 +31,17 @@ class CropTypes2(APIView):
         return Response(serializer.data)
 
 
-class CropPeriod1ViewSet(viewsets.ModelViewSet):
-    queryset = cropPeriod1.objects.all().order_by('Id')
-    serializer_class = cropPeriod1Serializer
+class cropPeriodViewSet(viewsets.ModelViewSet):
+    queryset = cropPeriod.objects.all().order_by('Id')
+    serializer_class = cropPeriod2Serializer
 
 
-class CropPeriod12View(APIView):
+class cropPeriod2View(APIView):
     def get(self, request, format=None):
 
         # serialize data
-        serializer = cropPeriod12Serializer(
-            cropPeriod1.objects.all(), many=True)
+        serializer = cropPeriod2Serializer(
+            cropPeriod.objects.all(), many=True)
 
         return Response(serializer.data)
 
@@ -61,17 +61,17 @@ class drainageType2View(APIView):
         return Response(serializer.data)
 
 
-class soilMoisture1ViewSet(viewsets.ModelViewSet):
-    queryset = soilMoisture1.objects.all().order_by('Id')
-    serializer_class = soilMoisture1Serializer
+class soilMoistureViewSet(viewsets.ModelViewSet):
+    queryset = soilMoisture.objects.all().order_by('Id')
+    serializer_class = soilMoistureSerializer
 
 
-class soilMoisture12View(APIView):
+class soilMoisture2View(APIView):
     def get(self, request, format=None):
 
         # serialize data
-        serializer = soilMoisture12Serializer(
-            soilMoisture1.objects.all(), many=True)
+        serializer = soilMoisture2Serializer(
+            soilMoisture.objects.all(), many=True)
 
         return Response(serializer.data)
 
@@ -93,7 +93,7 @@ class SoilTypes2(APIView):
 
 class hydrologicGroups(viewsets.ModelViewSet):
     queryset = hydrologicGroup.objects.all().order_by('Id')
-    serializer_class = hydrologicGroupSerializer
+    serializer_class = hydrologicGroup2Serializer
 
 
 class hydrologicGroups2(APIView):
@@ -218,14 +218,9 @@ class CalculateDroughtAPIView(APIView):
               "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
 
         # ____________________CORP PERIOD___________________
-        crop_period1 = cropPeriod1.objects.all()
+        crop_period1 = cropPeriod.objects.all()
         print("crop_period1 : \n", crop_period1)
-        cropPeriod1SerializerClass = cropPeriod1Serializer
-
-        # ____________________GROWTH STAGE____________________
-        growth_stage = growthStage.objects.all()
-        print("growth_stage : \n", growth_stage)
-        growthStageSerializerClass = growthStageSerializer
+        cropPeriodSerializerClass = cropPeriodSerializer
 
         # ____________________SOIL TYPE____________________
         soilTypeInfoall = soilType.objects.all()
@@ -265,9 +260,9 @@ class CalculateDroughtAPIView(APIView):
         print("soildrainageTypeVaule======", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
-        soil_moisture = soilMoisture1.objects.all()
+        soil_moisture = soilMoisture.objects.all()
         print("soil_moisture  : \n", soil_moisture)
-        soilMoistureSerializerClass = soilMoisture1Serializer
+        soilMoistureSerializerClass = soilMoistureSerializer
 
         soilMoistureInfo = soil_moisture.filter(
             Name=inputs["initMoistCond"]).values()
@@ -332,7 +327,7 @@ class CalculateDroughtAPIView(APIView):
         print("cropIdForType = ", cropIdForType)
 
         # cropPeriodForId is filtered for the cropId from cropPeriod
-        cropPeriodForId = cropPeriod1.objects.filter(
+        cropPeriodForId = cropPeriod.objects.filter(
             CropTypeId=cropIdForType).all()
 
         print("cropPeriodForId = ", cropPeriodForId)

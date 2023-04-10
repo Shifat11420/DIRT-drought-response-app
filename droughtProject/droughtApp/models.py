@@ -8,23 +8,11 @@ class cropType(models.Model):
     Name = models.CharField(max_length=20)
     GrowingPeriodDays = models.IntegerField()
     MaxRootDepth = models.IntegerField()
-    MaxAlllowableDeplition = models.IntegerField()
-    MaxRootDepthDAP = models.IntegerField()
+    MaxAlllowableDepletion = models.IntegerField()
+    MaxRootDepthDaysAfterPlanting = models.IntegerField()
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
-
-
-class growthStage(models.Model):
-    crop = models.CharField(max_length=20)
-    indicator = models.IntegerField()
-    emergence = models.CharField(max_length=30)
-    initialMoistureCheck = models.CharField(max_length=30)
-    irrigationInitiation = models.CharField(max_length=30)
-    irrigationTermination = models.CharField(max_length=30)
-
-    def __str__(self):
-        return str(self.indicator)+" "+self.crop
 
 
 class unitConversion(models.Model):
@@ -37,7 +25,7 @@ class unitConversion(models.Model):
         return self.flowMeterReadings
 
 
-class cropPeriod1(models.Model):
+class cropPeriod(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=30)
     CropTypeId = models.ForeignKey(
@@ -49,10 +37,10 @@ class cropPeriod1(models.Model):
         return str(self.Id)+" "+self.Name+" "+str(self.CropTypeId)
 
 
-class soilMoisture1(models.Model):
+class soilMoisture(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=30)
-    Ratio = models.FloatField()
+    InitialSoilMoisturePercent = models.FloatField()
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
@@ -60,7 +48,7 @@ class soilMoisture1(models.Model):
 
 class hydrologicGroup(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
-    Name = models.CharField(max_length=5)
+    Name = models.CharField(max_length=1)
 
     def __str__(self):
         return str(self.Id)+" "+str(self.Name)
@@ -69,9 +57,9 @@ class hydrologicGroup(models.Model):
 class drainageType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=50)
-    HydrologicGroupTypeId = models.ForeignKey(
+    HydrologicGroupId = models.ForeignKey(
         hydrologicGroup, on_delete=models.PROTECT)
-    ValueField = models.IntegerField()
+    DrainageValue = models.IntegerField()
 
     def __str__(self):
         return str(self.Id)+" "+self.Name+" "+str(self.HydrologicGroupTypeId)
@@ -93,7 +81,7 @@ class user(models.Model):
     FirstName = models.CharField(max_length=20)
     LastName = models.CharField(max_length=20)
     Email = models.EmailField()
-    AuthenticationInfo = models.CharField(max_length=50)
+    AuthenticationId = models.CharField(max_length=50)
 
     def __str__(self):
         return str(self.Id)+" "+self.FirstName+" "+self.LastName
@@ -101,22 +89,20 @@ class user(models.Model):
 
 class field(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
-    Name = models.CharField(max_length=50)
-    Latitude = models.FloatField()
-    Longitude = models.FloatField()
+    Name = models.CharField(max_length=150)
+    Latitude = models.DecimalField(max_digits=8, decimal_places=6)
+    Longitude = models.DecimalField(max_digits=9, decimal_places=6)
     Acreage = models.IntegerField()
     CropTypeId = models.ForeignKey(
         cropType, on_delete=models.PROTECT, blank=True, null=True)
     PlantDate = models.DateField()
-    SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
     HydrologicGroupTypeId = models.ForeignKey(
         hydrologicGroup, on_delete=models.PROTECT)
-    CropPeriodId = models.ForeignKey(
-        cropPeriod1, on_delete=models.PROTECT, null=True)
-    SoilMoistureId = models.ForeignKey(
-        soilMoisture1, on_delete=models.PROTECT, null=True)
     DrainageTypeId = models.ForeignKey(
         drainageType, on_delete=models.PROTECT, null=True)
+    SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
+    SoilMoistureId = models.ForeignKey(
+        soilMoisture, on_delete=models.PROTECT, null=True)
     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
 
     def __str__(self):

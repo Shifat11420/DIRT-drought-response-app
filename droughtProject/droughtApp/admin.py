@@ -1,11 +1,10 @@
 from django.contrib import admin
-from droughtApp.models import growthStage, unitConversion
+from droughtApp.models import unitConversion
 from droughtApp.models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from droughtApp.models import cropPeriod1,  soilMoisture1, drainageType
+from droughtApp.models import cropPeriod,  soilMoisture, drainageType
 
 
 # Register your models here.
-admin.site.register(growthStage)
 admin.site.register(unitConversion)
 
 
@@ -22,6 +21,6 @@ admin.site.register(soilType)
 admin.site.register(user)
 admin.site.register(field)
 admin.site.register(irrigation)
-admin.site.register(cropPeriod1)
-admin.site.register(soilMoisture1)
+admin.site.register(cropPeriod)
+admin.site.register(soilMoisture)
 admin.site.register(drainageType)

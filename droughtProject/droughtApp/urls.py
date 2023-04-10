@@ -12,9 +12,9 @@ router.register(r'fields', views.userfield)
 router.register(r'irrigation', views.irrigationActivity)
 
 
-router.register(r'SoilMoisture1', views.soilMoisture1ViewSet)
+router.register(r'soilMoisture', views.soilMoistureViewSet)
 # router.register(r'CropType1', views.CropType1ViewSet)
-router.register(r'CropPeriod1', views.CropPeriod1ViewSet)
+router.register(r'cropPeriod', views.cropPeriodViewSet)
 router.register(r'drainageType', views.drainageTypeViewSet)
 
 urlpatterns = [
