@@ -8,7 +8,7 @@ class cropType(models.Model):
     Name = models.CharField(max_length=20)
     GrowingPeriodDays = models.IntegerField()
     MaxRootDepth = models.IntegerField()
-    MaxAllowableDepletion = models.IntegerField()
+    MaxAlllowableDepletion = models.IntegerField()
     MaxRootDepthDaysAfterPlanting = models.IntegerField()
 
     def __str__(self):
