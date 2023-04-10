@@ -8,21 +8,11 @@ class cropType(models.Model):
     Name = models.CharField(max_length=20)
     GrowingPeriodDays = models.IntegerField()
     MaxRootDepth = models.IntegerField()
-    MaxAlllowableDepletion = models.IntegerField()
+    MaxAllowableDepletion = models.IntegerField()
     MaxRootDepthDaysAfterPlanting = models.IntegerField()
 
     def __str__(self):
         return str(self.Id)+" "+self.Name
-
-
-class unitConversion(models.Model):
-    flowMeterReadings = models.CharField(max_length=30)
-    indicator = models.IntegerField()
-    units = models.CharField(max_length=30)
-    conversion = models.FloatField()
-
-    def __str__(self):
-        return self.flowMeterReadings
 
 
 class cropPeriod(models.Model):
@@ -118,3 +108,13 @@ class irrigation(models.Model):
 
     def __str__(self):
         return str(self.Id)+str(self.Date)
+
+
+class unitConversion(models.Model):
+    flowMeterReadings = models.CharField(max_length=30)
+    indicator = models.IntegerField()
+    units = models.CharField(max_length=30)
+    conversion = models.FloatField()
+
+    def __str__(self):
+        return self.flowMeterReadings
