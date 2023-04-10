@@ -171,8 +171,8 @@ class CalculateDroughtAPIView(APIView):
             Name=inputs["initMoistCond"]).values()
         print("soilMoistureInfo = ", soilMoistureInfo)
         for q in soilMoistureInfo:
-            ratioQUERY = q['Ratio']
-        print("ratioQUERY = ", ratioQUERY)
+            ratio = q['Ratio']
+        print("ratio = ", ratio)
 
         # ____________________UNIT CONVERSION____________________
         unit_conversion = unitConversion.objects.all()
@@ -273,9 +273,6 @@ class CalculateDroughtAPIView(APIView):
         storage = (1000/soildrainageTypeValue) - 10
         print("inputs[plantCond] = ", inputs["plantCond"],
               "inputs[hydroSoilGrp] = ", inputs["hydroSoilGrp"], "storage =", storage)
-
-        ratio = ratioQUERY
-        print("ratio =", ratio)
 
         ############## _________________________________##############
         # Run the calculation
