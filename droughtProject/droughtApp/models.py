@@ -15,16 +15,6 @@ class cropType(models.Model):
         return str(self.Id)+" "+self.Name
 
 
-class unitConversion(models.Model):
-    flowMeterReadings = models.CharField(max_length=30)
-    indicator = models.IntegerField()
-    units = models.CharField(max_length=30)
-    conversion = models.FloatField()
-
-    def __str__(self):
-        return self.flowMeterReadings
-
-
 class cropPeriod(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
     Name = models.CharField(max_length=30)
@@ -118,3 +108,13 @@ class irrigation(models.Model):
 
     def __str__(self):
         return str(self.Id)+str(self.Date)
+
+
+class unitConversion(models.Model):
+    flowMeterReadings = models.CharField(max_length=30)
+    indicator = models.IntegerField()
+    units = models.CharField(max_length=30)
+    conversion = models.FloatField()
+
+    def __str__(self):
+        return self.flowMeterReadings
