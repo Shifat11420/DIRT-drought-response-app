@@ -1,7 +1,6 @@
 from django.contrib import admin
 from droughtApp.models import unitConversion
-from droughtApp.models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from droughtApp.models import cropPeriod,  soilMoisture, drainageType
+from droughtApp.models import cropType, soilType, hydrologicGroup, user, field, irrigation, cropPeriod,  soilMoisture, drainageType
 
 
 # Register your models here.
@@ -14,7 +13,6 @@ class cropTypeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(cropType, admin.ModelAdmin)
-
 
 admin.site.register(hydrologicGroup)
 admin.site.register(soilType)
