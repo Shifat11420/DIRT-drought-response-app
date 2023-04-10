@@ -5,12 +5,12 @@ from . import views
 router = routers.DefaultRouter()
 
 router.register(r'user', views.userInfo)
-router.register(r'fields', views.userfield)
+router.register(r'field', views.userfield)
 router.register(r'irrigation', views.irrigationActivity)
 
-router.register(r'croptypes', views.CropTypes)
-router.register(r'soiltypes', views.SoilTypes)
-router.register(r'hydrologicgroups', views.hydrologicGroups)
+router.register(r'croptype', views.CropTypes)
+router.register(r'soiltype', views.SoilTypes)
+router.register(r'hydrologicgroup', views.hydrologicGroups)
 router.register(r'drainageType', views.drainageTypeViewSet)
 router.register(r'soilMoisture', views.soilMoistureViewSet)
 
