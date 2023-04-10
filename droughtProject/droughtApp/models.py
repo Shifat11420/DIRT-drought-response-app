@@ -93,6 +93,7 @@ class field(models.Model):
     Latitude = models.DecimalField(max_digits=8, decimal_places=6)
     Longitude = models.DecimalField(max_digits=9, decimal_places=6)
     Acreage = models.IntegerField()
+    Elevation = models.FloatField(null=True)
     CropTypeId = models.ForeignKey(
         cropType, on_delete=models.PROTECT, blank=True, null=True)
     PlantDate = models.DateField()
