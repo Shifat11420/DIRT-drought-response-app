@@ -53,11 +53,15 @@ class userInfo(viewsets.ModelViewSet):
 class userfield(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['Id']
 
 
 class irrigationActivity(viewsets.ModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['FieldId']
 
 
 # drought calculator
