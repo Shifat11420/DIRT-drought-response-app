@@ -57,7 +57,7 @@ class drainageType(models.Model):
 
 class soilType(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
-    Name = models.CharField(max_length=20)
+    Name = models.CharField(max_length=50)
     AveragePlantAvailableWater = models.FloatField(null=True)
     PermanentWiltingPoint = models.FloatField(null=True)
     FieldCapacity = models.FloatField(null=True)

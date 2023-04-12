@@ -83,11 +83,21 @@ WSGI_APPLICATION = 'droughtProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'mssql',
+        'NAME': 'DroughtResponse',
+        'USER': 'svc_droughtresponse_api',
+        'PASSWORD': ' HgTYrf!43Rabba',
+        'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
+        'PORT': '',
+
+        'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
 }
 
+# set this to False if you want to turn off pyodbc's connection pooling
+DATABASE_CONNECTION_POOLING = False
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
