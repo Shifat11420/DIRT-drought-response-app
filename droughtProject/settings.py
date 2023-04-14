@@ -86,7 +86,7 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': 'DroughtResponse',
         'USER': 'svc_droughtresponse_api',
-        'PASSWORD': ' HgTYrf!43Rabba',
+        'PASSWORD': 'HgTYrf!43Rabba',
         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
         'PORT': '',
 
