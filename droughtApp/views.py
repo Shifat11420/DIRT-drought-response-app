@@ -13,51 +13,55 @@ from .functionAPI import *
 from .functions import *
 
 
-class CropTypes(viewsets.ModelViewSet):
+class CropTypes(viewsets.ReadOnlyModelViewSet):
     queryset = cropType.objects.all().order_by('Id')
     serializer_class = cropTypesSerializer
 
 
-class cropPeriodViewSet(viewsets.ModelViewSet):
+class cropPeriodViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = cropPeriod.objects.all().order_by('Id')
     serializer_class = cropPeriodSerializer
 
 
-class drainageTypeViewSet(viewsets.ModelViewSet):
+class drainageTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = drainageType.objects.all().order_by('Id')
     serializer_class = drainageTypeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['HydrologicGroupId']
 
 
-class soilMoistureViewSet(viewsets.ModelViewSet):
+class soilMoistureViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = soilMoisture.objects.all().order_by('Id')
     serializer_class = soilMoistureSerializer
 
 
-class SoilTypes(viewsets.ModelViewSet):
+class SoilTypes(viewsets.ReadOnlyModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
     serializer_class = soilTypeSerializer
 
 
-class hydrologicGroups(viewsets.ModelViewSet):
+class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
     queryset = hydrologicGroup.objects.all().order_by('Id')
     serializer_class = hydrologicGroupSerializer
 
 
-class userInfo(viewsets.ModelViewSet):
+class userInfo(viewsets.ReadOnlyModelViewSet):
     queryset = user.objects.all().order_by('Id')
     serializer_class = userSerializer
 
 
-class userfield(viewsets.ModelViewSet):
+class userfield(viewsets.ReadOnlyModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['Id']
 
 
-class irrigationActivity(viewsets.ModelViewSet):
+class irrigationActivity(viewsets.ReadOnlyModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['FieldId']
 
 
 # drought calculator
