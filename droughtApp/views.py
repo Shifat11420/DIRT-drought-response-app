@@ -45,19 +45,19 @@ class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
     serializer_class = hydrologicGroupSerializer
 
 
-class userInfo(viewsets.ReadOnlyModelViewSet):
+class userInfo(viewsets.ModelViewSet):
     queryset = user.objects.all().order_by('Id')
     serializer_class = userSerializer
 
 
-class userfield(viewsets.ReadOnlyModelViewSet):
+class userfield(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['Id']
 
 
-class irrigationActivity(viewsets.ReadOnlyModelViewSet):
+class irrigationActivity(viewsets.ModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
     filter_backends = [DjangoFilterBackend]
