@@ -85,13 +85,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'DroughtResponse',
-        'USER': 'svc_droughtresponse_api',
-        'PASSWORD': 'HgTYrf!43Rabba',
         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
         'PORT': '',
 
         'OPTIONS': {
                 'driver': 'ODBC Driver 17 for SQL Server',
+                'extra_params': 'Authentication=ActiveDirectoryMsi',
         },
     },
 }
