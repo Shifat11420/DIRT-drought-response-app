@@ -13,34 +13,34 @@ from .functionAPI import *
 from .functions import *
 
 
-class CropTypes(viewsets.ModelViewSet):
+class CropTypes(viewsets.ReadOnlyModelViewSet):
     queryset = cropType.objects.all().order_by('Id')
     serializer_class = cropTypesSerializer
 
 
-class cropPeriodViewSet(viewsets.ModelViewSet):
+class cropPeriodViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = cropPeriod.objects.all().order_by('Id')
     serializer_class = cropPeriodSerializer
 
 
-class drainageTypeViewSet(viewsets.ModelViewSet):
+class drainageTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = drainageType.objects.all().order_by('Id')
     serializer_class = drainageTypeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['HydrologicGroupId']
 
 
-class soilMoistureViewSet(viewsets.ModelViewSet):
+class soilMoistureViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = soilMoisture.objects.all().order_by('Id')
     serializer_class = soilMoistureSerializer
 
 
-class SoilTypes(viewsets.ModelViewSet):
+class SoilTypes(viewsets.ReadOnlyModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
     serializer_class = soilTypeSerializer
 
 
-class hydrologicGroups(viewsets.ModelViewSet):
+class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
     queryset = hydrologicGroup.objects.all().order_by('Id')
     serializer_class = hydrologicGroupSerializer
 
@@ -53,11 +53,15 @@ class userInfo(viewsets.ModelViewSet):
 class userfield(viewsets.ModelViewSet):
     queryset = field.objects.all().order_by('Id')
     serializer_class = fieldSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['Id']
 
 
 class irrigationActivity(viewsets.ModelViewSet):
     queryset = irrigation.objects.all().order_by('Id')
     serializer_class = irrigationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['FieldId']
 
 
 # drought calculator
@@ -85,6 +89,9 @@ class CalculateDroughtAPIView(APIView):
         # maxRootDepth = ""
 
         inputs = request.data
+        lat = inputs["lat"]
+        long = inputs["long"]
+        elevation = inputs["elevation"]
 
         daps = {"Early": "", "Development": "", "Mid": "",
                 "Late": "", "Last Irrig. Event": ""}
@@ -100,7 +107,7 @@ class CalculateDroughtAPIView(APIView):
 
         # API request_____ from AERISweatherAPI
         rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-            plantingDate)
+            plantingDate, lat, long)
         # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
 
         # _______________________________________
@@ -116,11 +123,11 @@ class CalculateDroughtAPIView(APIView):
         for q in queryCropType:
             lengthOfGrowingPeriodQUERY = q['GrowingPeriodDays']
             maxRootDepthQUERY = q['MaxRootDepth']
-            maxAlllowableDeplitionQUERY = q['MaxAlllowableDeplition']
-            dAPforMaxRootDepthQUERY = q['MaxRootDepthDAP']
+            maxAllowableDeplitionQUERY = q['MaxAllowableDepletion']
+            dAPforMaxRootDepthQUERY = q['MaxRootDepthDaysAfterPlanting']
 
         print("for crops _", inputs["cropType"], "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
-              "maxAlllowableDeplitionQUERY =", maxAlllowableDeplitionQUERY, "\n",
+              "maxAllowableDeplitionQUERY =", maxAllowableDeplitionQUERY, "\n",
               "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
 
         # ____________________CORP PERIOD___________________
@@ -174,7 +181,7 @@ class CalculateDroughtAPIView(APIView):
             Name=inputs["initMoistCond"]).values()
         print("soilMoistureInfo = ", soilMoistureInfo)
         for q in soilMoistureInfo:
-            ratio = q['Ratio']
+            ratio = q['InitialSoilMoisturePercent']
         print("ratio = ", ratio)
 
         # ____________________UNIT CONVERSION____________________
@@ -223,7 +230,7 @@ class CalculateDroughtAPIView(APIView):
                            for i in root_depth]
 
         if inputs["maxAllowDepl"] == "":
-            inputs["maxAllowDepl"] = maxAlllowableDeplitionQUERY
+            inputs["maxAllowDepl"] = maxAllowableDeplitionQUERY
         refill_point = [round(i-(inputs["maxAllowDepl"]/100)*(i-j), 2)
                         for i, j in zip(field_capacity, perm_wilt_point)]
 
@@ -309,7 +316,7 @@ class CalculateDroughtAPIView(APIView):
         # all other values will come from API
         # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
 
-        ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
+        ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
                               maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
         # penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,wind_speed,J,wind_z=10,Gsc=0.0820,alpha=0.23,G=0):
 
@@ -327,7 +334,7 @@ class CalculateDroughtAPIView(APIView):
         gross_irrig_inch = grossIrrigation * grossIrrigFactor
 
         FC_plantday = field_capacity[day]
-        MADforgraph = maxAlllowableDeplitionQUERY * FC_plantday
+        MADforgraph = maxAllowableDeplitionQUERY * FC_plantday
         pwp_plantday = perm_wilt_point[day]
 
         ##############
@@ -376,7 +383,7 @@ class CalculateDroughtAPIView(APIView):
 
         # # API request
         # rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-        #     NextDayDate)
+        #     NextDayDate, lat, long)
         # # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
         # ####################################################################
 
@@ -388,7 +395,7 @@ class CalculateDroughtAPIView(APIView):
         # # ET
         # J = J0+day
         # # all other values will come from API
-        # ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
+        # ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
         #                       maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
         # # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
         # print("ET0 : ", ET0)
@@ -406,7 +413,7 @@ class CalculateDroughtAPIView(APIView):
 
         # gross_irrig_inch = grossIrrigation * grossIrrigFactor
         # FC_growthday = field_capacity[day]
-        # MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
+        # MADforgraph = maxAllowableDeplitionQUERY * FC_growthday
         # pwp_growthday = perm_wilt_point[day]
 
         # #########
@@ -478,7 +485,7 @@ class CalculateDroughtAPIView(APIView):
 
             # API request
             rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-                NextDayDate)
+                NextDayDate, lat, long)
             # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
             ############### ____________________________________#################
 
@@ -490,7 +497,7 @@ class CalculateDroughtAPIView(APIView):
             # ET
             J = J0+day
             # all other values will come from API
-            ET0 = penman_monteith(31.177, 21.6, maxTempF, minTempF,
+            ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
                                   maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
             # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
             print("ET0 : ", ET0)
@@ -508,7 +515,7 @@ class CalculateDroughtAPIView(APIView):
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
             FC_growthday = field_capacity[day]
-            MADforgraph = maxAlllowableDeplitionQUERY * FC_growthday
+            MADforgraph = maxAllowableDeplitionQUERY * FC_growthday
             pwp_growthday = perm_wilt_point[day]
 
             #########

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,8 @@ SECRET_KEY = 'django-insecure-(3rbwskk%g#c5s(@%&1&r2pe*r+k**+2izq4h=+s2q-$1g4s)0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "lsuag.ngrok.io"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost",
+                 "droughtresponseapi-dev.azurewebsites.net"]
 
 
 # Application definition
@@ -81,11 +83,20 @@ WSGI_APPLICATION = 'droughtProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'mssql',
+        'NAME': 'DroughtResponse',
+        'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
+        'USER': 'svc_droughtresponse_api',
+        'PASSWORD': 'HgTYrf!43Rabba',
+        'PORT': '',
+        'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    },
 }
 
+# set this to False if you want to turn off pyodbc's connection pooling
+DATABASE_CONNECTION_POOLING = False
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -121,6 +132,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 STATIC_URL = 'static/'
 
 # Default primary key field type
