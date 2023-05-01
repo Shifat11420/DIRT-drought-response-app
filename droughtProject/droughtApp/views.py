@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -7,6 +8,7 @@ from .models import *
 from .models import results
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import JsonResponse
 
 # drought calculator imports
 from datetime import datetime, timedelta, date
@@ -383,88 +385,6 @@ class CalculateDroughtAPIView(APIView):
         grossIrrg.append(grossIrrigation)
         rainFall.append(rainfall_totalIN)
 
-        # #### ---------------here just current day results -----------####
-        # #######
-        # """"""
-
-        # # For next day to the planting day
-        # print("\n\n")
-        # NextDayDate = plantingDate + timedelta(days=5)
-        # # NextDay_Date = str(datetime.strftime(NextDay_Date, "%m/%d/%Y"))
-        # print("NextDay Date : ", NextDayDate)
-
-        # # API request
-        # rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-        #     NextDayDate, lat, long)
-        # # print("second---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-        # ####################################################################
-
-        # # increase day incrementally
-        # day = 1
-        # rain = rainfall_totalIN  # API
-        # print("Rain on day 1 = ", rain)
-
-        # # ET
-        # J = J0+day
-        # # all other values will come from API
-        # ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
-        #                       maxHumidity, minHumidity, solradWM2, windSpeedMPH, J)
-        # # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J)
-        # print("ET0 : ", ET0)
-
-        # # if farmer provides irrigation value for a day
-        # grossIrrigation = 0  # farmer override
-        # grossIrrigUnit = "Acre-inch"  # dropdown if farmer provides a value in grossIrrigation
-
-        # unitConversionInfo = unit_conversion.filter(
-        #     flowMeterReadings=grossIrrigUnit).values()
-        # for q in unitConversionInfo:
-        #     conversionQUERY = q['conversion']
-        # grossIrrigFactor = conversionQUERY
-        # print("grossIrrigFactor = ", grossIrrigFactor)
-
-        # gross_irrig_inch = grossIrrigation * grossIrrigFactor
-        # FC_growthday = field_capacity[day]
-        # MADforgraph = maxAllowableDeplitionQUERY * FC_growthday
-        # pwp_growthday = perm_wilt_point[day]
-
-        # #########
-        # swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], inputs["fieldCap"],
-        #                                                          refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
-
-        # if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
-        #     (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
-        #     (day < daps['Development'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
-        #         (field_capacity[day]-swl > 3 and day >= daps['Development'] and day < daps['Last Irrig. Event'])) and (field_capacity[day]-swl > 1)):
-        #     eff_irrigation = field_capacity[day] - swl
-        # else:
-        #     eff_irrigation = 0
-
-        # if gross_irrig_inch > 0:
-        #     irrigation_eff = eff_irrigation/gross_irrig_inch
-        # else:
-        #     irrigation_eff = "nan"  # np.nan
-        # ###############
-
-        # water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
-
-        # SWLs.append(swl)
-        # EWLs.append(ewl)
-        # DPs.append(dp)
-        # SRs.append(sr)
-        # VWCs.append(vwc)
-        # effIrrig.append(eff_irrigation)
-        # irrigEffic.append(irrigation_eff)
-        # forDate.append(NextDayDate.strftime('%m/%d/%Y'))
-        # FC.append(FC_growthday)
-        # MADg.append(MADforgraph)
-        # waterDeficit.append(water_Deficit)
-        # pwp.append(pwp_growthday)
-        # grossIrrg.append(grossIrrigation)
-        # rainFall.append(rainfall_totalIN)
-
-        # #-----------------------FOR LOOP-------------------------------------------------------------------------------------
-
         print("---  here code for loop starts  ---")
         print("\n\n")
         # #######
@@ -587,3 +507,21 @@ class CalculateDroughtAPIView(APIView):
         resultsDict = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
                        "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall}
         return Response({'results': resultsDict})
+
+
+class resultsAPIView(APIView):
+    def get(self, request, format=None):
+        inputs = request.data
+
+        relatedDataforField = list(
+            results.objects.filter(FieldId=inputs["fieldId"]).all()[inputs["offset"]:inputs["offset"] + inputs["limit"]])
+        print(relatedDataforField)
+        Serializer = resultSerializer(
+            relatedDataforField, many=True, context={'request': request})
+        return Response(Serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        inputs = request.data
+        deleteforField = results.objects.filter(FieldId=inputs["fieldId"])
+        deleteforField.delete()
+        return HttpResponse(status=204)
