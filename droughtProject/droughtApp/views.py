@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from .models import *
+from .models import results
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -64,7 +65,7 @@ class irrigationActivity(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['FieldId']
 
 
-class resultViewSet(viewsets.ReadOnlyModelViewSet):
+class resultViewSet(viewsets.ModelViewSet):
     queryset = results.objects.all().order_by('Id')
     serializer_class = resultSerializer
     filter_backends = [DjangoFilterBackend]
@@ -363,8 +364,9 @@ class CalculateDroughtAPIView(APIView):
         ##############
         water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
 
-        # p = results(WaterLevelStart=SWLs, WaterLevelEnd=EWLs, DeepPercolation=DPs, SurfaceRunoff=SRs, VolumetricWaterContent=VWCs, EffectiveIrrigation=, IrrigationEfficiency=, MaximumAvailableDepletion=, FieldCapacity, PermanentWiltingPoint=, IrrigationActivityAmount=, )
-        # p.save()
+        plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
+                                  MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN)
+        plantdayresults.save()
 
         SWLs.append(swl)
         EWLs.append(ewl)
@@ -563,6 +565,10 @@ class CalculateDroughtAPIView(APIView):
             grossIrrg.append(grossIrrigation)
             rainFall.append(rainfall_totalIN)
 
+            growingdaysresults = results(Date=NextDayDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
+                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN)
+            growingdaysresults.save()
+
         print("SWLs : ", SWLs)
         print("EWLs : ", EWLs)
         print("DPs : ", DPs)
@@ -578,6 +584,6 @@ class CalculateDroughtAPIView(APIView):
         print(" gross irrigation : ", grossIrrg)
         print("rain fall in inches : ", rainFall)
 
-        results = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
-                   "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall}
-        return Response({'results': results})
+        resultsDict = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
+                       "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall}
+        return Response({'results': resultsDict})

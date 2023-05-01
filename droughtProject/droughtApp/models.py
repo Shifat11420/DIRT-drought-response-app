@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 from django.db import models
 
 
@@ -125,8 +126,9 @@ class unitConversion(models.Model):
 
 class results(models.Model):
     Id = models.IntegerField(primary_key=True, null=False)
-    FieldId = models.ForeignKey(field, on_delete=models.PROTECT)
-    Date = models.DateField()
+    FieldId = models.ForeignKey(
+        field, on_delete=models.PROTECT, null=True)
+    Date = models.DateField(blank=True, default=date(1111, 11, 11), null=True)
     WaterLevelStart = models.FloatField(null=True)
     WaterLevelEnd = models.FloatField(null=True)
     DeepPercolation = models.FloatField(null=True)
