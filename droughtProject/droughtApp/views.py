@@ -64,6 +64,13 @@ class irrigationActivity(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['FieldId']
 
 
+class resultViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = results.objects.all().order_by('Id')
+    serializer_class = resultSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['FieldId']
+
+
 # drought calculator
 ####################################################################
 
@@ -355,6 +362,9 @@ class CalculateDroughtAPIView(APIView):
             irrigation_eff = "nan"  # np.nan
         ##############
         water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
+
+        # p = results(WaterLevelStart=SWLs, WaterLevelEnd=EWLs, DeepPercolation=DPs, SurfaceRunoff=SRs, VolumetricWaterContent=VWCs, EffectiveIrrigation=, IrrigationEfficiency=, MaximumAvailableDepletion=, FieldCapacity, PermanentWiltingPoint=, IrrigationActivityAmount=, )
+        # p.save()
 
         SWLs.append(swl)
         EWLs.append(ewl)

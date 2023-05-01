@@ -1,7 +1,5 @@
 from rest_framework import serializers
-from .models import unitConversion
-from .models import cropType, soilType, hydrologicGroup, user, field, irrigation
-from .models import cropPeriod, soilMoisture, drainageType
+from .models import *
 
 
 class cropTypesSerializer(serializers.ModelSerializer):
@@ -61,4 +59,10 @@ class irrigationSerializer(serializers.ModelSerializer):
 class unitConversionSerializer(serializers.ModelSerializer):
     class Meta:
         model = unitConversion
+        fields = '__all__'
+
+
+class resultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = results
         fields = '__all__'
