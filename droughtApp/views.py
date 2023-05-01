@@ -14,24 +14,24 @@ from .functions import *
 
 
 class CropTypes(viewsets.ReadOnlyModelViewSet):
-    queryset = cropType.objects.all().order_by('Id')
+    queryset = cropType.objects.all()
     serializer_class = cropTypesSerializer
 
 
 class cropPeriodViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = cropPeriod.objects.all().order_by('Id')
+    queryset = cropPeriod.objects.all()
     serializer_class = cropPeriodSerializer
 
 
 class drainageTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = drainageType.objects.all().order_by('Id')
+    queryset = drainageType.objects.all()
     serializer_class = drainageTypeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['HydrologicGroupId']
 
 
 class soilMoistureViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = soilMoisture.objects.all().order_by('Id')
+    queryset = soilMoisture.objects.all()
     serializer_class = soilMoistureSerializer
 
 
@@ -41,24 +41,26 @@ class SoilTypes(viewsets.ReadOnlyModelViewSet):
 
 
 class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
-    queryset = hydrologicGroup.objects.all().order_by('Id')
+    queryset = hydrologicGroup.objects.all()
     serializer_class = hydrologicGroupSerializer
 
 
 class userInfo(viewsets.ModelViewSet):
-    queryset = user.objects.all().order_by('Id')
+    queryset = user.objects.all()
     serializer_class = userSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['AuthenticationId']
 
 
 class userfield(viewsets.ModelViewSet):
-    queryset = field.objects.all().order_by('Id')
+    queryset = field.objects.all()
     serializer_class = fieldSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['Id']
+    filterset_fields = ['OwnerId']
 
 
 class irrigationActivity(viewsets.ModelViewSet):
-    queryset = irrigation.objects.all().order_by('Id')
+    queryset = irrigation.objects.all()
     serializer_class = irrigationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['FieldId']
