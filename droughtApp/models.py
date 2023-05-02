@@ -134,4 +134,4 @@ class results(models.Model):
     RainObservedAmount = models.FloatField(null=True)
 
     def __str__(self):
-        return str(self.Id)+str(self.Date)+"Field : "+str(self.FieldId)
+        return str(self.Date)+"Field : "+str(self.FieldId)
