@@ -84,11 +84,12 @@ WSGI_APPLICATION = 'droughtProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'DroughtResponse',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'DIRT',
+        'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
+        'PORT': '1433',
         'OPTIONS': {
                 'driver': 'ODBC Driver 17 for SQL Server',
+                'extra_params': 'Authentication=ActiveDirectoryMsi',
         },
     },
 }
