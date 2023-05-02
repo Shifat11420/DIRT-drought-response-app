@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 from django.db import models
 
 
@@ -86,6 +87,9 @@ class field(models.Model):
     SoilTypeId = models.ForeignKey(soilType, on_delete=models.PROTECT)
     SoilMoistureId = models.ForeignKey(
         soilMoisture, on_delete=models.PROTECT, null=True)
+    GrowingPeriodDays = models.IntegerField(null=True)
+    FieldCapacity = models.FloatField(null=True)
+    PermanentWiltingPoint = models.FloatField(null=True)
     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -109,3 +113,25 @@ class unitConversion(models.Model):
 
     def __str__(self):
         return self.flowMeterReadings
+
+
+class results(models.Model):
+    FieldId = models.ForeignKey(
+        field, on_delete=models.PROTECT, null=True)
+    Date = models.DateField(blank=True, default=date(1111, 11, 11), null=True)
+    WaterLevelStart = models.FloatField(null=True)
+    WaterLevelEnd = models.FloatField(null=True)
+    DeepPercolation = models.FloatField(null=True)
+    SurfaceRunoff = models.FloatField(null=True)
+    VolumetricWaterContent = models.FloatField(null=True)
+    EffectiveIrrigation = models.FloatField(null=True)
+    IrrigationEfficiency = models.FloatField(null=True)
+    MaximumAvailableDepletion = models.FloatField(null=True)
+    FieldCapacity = models.FloatField(null=True)
+    PermanentWiltingPoint = models.FloatField(null=True)
+    WaterDeficit = models.FloatField(null=True)
+    IrrigationActivityAmount = models.FloatField(null=True)
+    RainObservedAmount = models.FloatField(null=True)
+
+    def __str__(self):
+        return str(self.Id)+str(self.Date)+"Field : "+str(self.FieldId)
