@@ -170,7 +170,7 @@ class CalculateDroughtAPIView(APIView):
         hydrogrpQUERY = hydrologicGroup.objects.filter(
             Name=inputs["hydroSoilGrp"]).values()[0]
         hydrogroupName = hydrogrpQUERY['Name']
-        hydrogroupId = hydrogrpQUERY['Id']
+        hydrogroupId = hydrogrpQUERY['id']
         print("hydrogroupName = ", hydrogroupName)
         print("hydrogroupId = ", hydrogroupId)
 
@@ -246,7 +246,7 @@ class CalculateDroughtAPIView(APIView):
 
         # demo is the cropid matched from croptype
         cropIdForType = cropType.objects.filter(
-            Name=inputs["cropType"]).values()[0]['Id']
+            Name=inputs["cropType"]).values()[0]['id']
         print("cropIdForType = ", cropIdForType)
 
         # cropPeriodForId is filtered for the cropId from cropPeriod
@@ -362,7 +362,7 @@ class CalculateDroughtAPIView(APIView):
         if gross_irrig_inch > 0:
             irrigation_eff = eff_irrigation/gross_irrig_inch
         else:
-            irrigation_eff = "nan"  # np.nan
+            irrigation_eff = None  # np.nan
         ##############
         water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
 
@@ -547,7 +547,7 @@ class CalculateDroughtAPIView(APIView):
             if gross_irrig_inch > 0:
                 irrigation_eff = eff_irrigation/gross_irrig_inch
             else:
-                irrigation_eff = "nan"  # np.nan
+                irrigation_eff = None  # np.nan
             ###############
 
             water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
