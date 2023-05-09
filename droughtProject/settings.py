@@ -94,6 +94,20 @@ DATABASES = {
     },
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'mssql',
+#         'NAME': 'DIRT',
+#         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
+#         'USER': 'svc_droughtresponse_api',
+#         'PASSWORD': 'HgTYrf!43Rabba',
+#         'PORT': '',
+#         'OPTIONS': {
+#                 'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+# }
+
 # set this to False if you want to turn off pyodbc's connection pooling
 DATABASE_CONNECTION_POOLING = False
 
