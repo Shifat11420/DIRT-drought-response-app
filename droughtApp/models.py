@@ -90,6 +90,7 @@ class field(models.Model):
     GrowingPeriodDays = models.IntegerField(null=True)
     FieldCapacity = models.FloatField(null=True)
     PermanentWiltingPoint = models.FloatField(null=True)
+    PlantAvailableWater = models.FloatField(null=True)
     OwnerId = models.ForeignKey(user, on_delete=models.PROTECT)
 
     def __str__(self):
