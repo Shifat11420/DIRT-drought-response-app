@@ -139,7 +139,8 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+# Azure SQL does not have timezone support: https://devblogs.microsoft.com/azure-sql/create-rest-api-in-python-with-django-using-the-django-rest-framework-and-azure-sql/
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
