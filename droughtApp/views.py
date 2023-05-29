@@ -7,8 +7,15 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from .models import *
 from .serializers import *
+
+
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import JsonResponse
+
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 # drought calculator imports
 from datetime import datetime, timedelta, date
@@ -48,7 +55,31 @@ class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
     serializer_class = hydrologicGroupSerializer
 
 
+class HelloView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permissions_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # <------ Response to the client
+        context = {"message": "Hello, World!"}
+        return Response(context)
+
+
+class ExampleView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        content = {
+            'user': str(request.user),  # `django.contrib.auth.User` instance.
+            'auth': str(request.auth),  # None
+        }
+        return Response(content)
+
+
 class userInfo(viewsets.ModelViewSet):
+    permissions_classes = [IsAuthenticated]
+
     queryset = user.objects.all()
     serializer_class = userSerializer
     filter_backends = [DjangoFilterBackend]
@@ -79,8 +110,10 @@ class irrigationActivity(viewsets.ModelViewSet):
 class resultViewSet(viewsets.ModelViewSet):
     queryset = results.objects.all()
     serializer_class = resultSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['FieldId']
+    ordering_fields = ['Date']
+    # ordering = ['Date']
 
     @action(detail=True, methods=['delete'])
     def deleteforfield(self, request, pk=None):
