@@ -197,7 +197,7 @@ class CalculateDroughtAPIView(APIView):
         planting_date = plantingDate
         print("planting_date = ", planting_date)
 
-        if currentField.GrowingPeriodDays:
+        if currentField.GrowingPeriodDays:  
             seasonLength = currentField.GrowingPeriodDays
         else:
             seasonLength = lengthOfGrowingPeriodQUERY
@@ -301,6 +301,8 @@ class CalculateDroughtAPIView(APIView):
         pwp = []
         grossIrrg = []
         rainFall = []
+        ETOs = []
+        ETCs = []
 
         #######
         # at planting date, day = 0
@@ -319,6 +321,7 @@ class CalculateDroughtAPIView(APIView):
         ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
                               maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
         # penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,wind_speed,J,wind_z=10,Gsc=0.0820,alpha=0.23,G=0):
+        print("ET0 on planting day = ", ET0)
 
         # if farmer provides irrigation value for a day
         grossIrrigation = 0              # farmer override
@@ -356,7 +359,8 @@ class CalculateDroughtAPIView(APIView):
         water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
 
         plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                  MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN, FieldId=currentField)
+                                  MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN, 
+                                  FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
         plantdayresults.save()
 
         SWLs.append(swl)
@@ -373,6 +377,8 @@ class CalculateDroughtAPIView(APIView):
         pwp.append(pwp_plantday)
         grossIrrg.append(grossIrrigation)
         rainFall.append(rainfall_totalIN)
+        ETOs.append(ET0)
+        ETCs.append(round(crop_et,3))
 
         print("---  here code for loop starts  ---")
         print("\n\n")
@@ -468,9 +474,12 @@ class CalculateDroughtAPIView(APIView):
             pwp.append(pwp_growthday)
             grossIrrg.append(grossIrrigation)
             rainFall.append(rainfall_totalIN)
+            ETOs.append(ET0)
+            ETCs.append(round(crop_et,3))
 
             growingdaysresults = results(Date=NextDayDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  FieldId=currentField)
+                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  
+                                         FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
             growingdaysresults.save()
 
         print("SWLs : ", SWLs)
@@ -487,7 +496,10 @@ class CalculateDroughtAPIView(APIView):
         print("pwp : ", pwp)
         print(" gross irrigation : ", grossIrrg)
         print("rain fall in inches : ", rainFall)
+        print("EvapotranporationValue : ", ETOs)
+        print("EvapotranporationCropValue : ", ETCs)
 
         resultsDict = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
-                       "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall}
+                       "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall, 
+                       'EvapotranporationValue': ETOs, 'EvapotranporationCropValue' : ETCs}
         return Response({'results': resultsDict})
