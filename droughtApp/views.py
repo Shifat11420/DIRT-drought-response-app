@@ -96,11 +96,30 @@ class resultViewSet(viewsets.ModelViewSet):
 # drought calculator
 class CalculateDroughtAPIView(APIView):
     def get(self, request, format=None):
+        SWLs = []                # append starting water level
+        EWLs = []                # append ending water level
+        DPs = []                 # append deep percolation
+        SRs = []                 # append surface runoff
+        VWCs = []                # append volumetric water content
+        effIrrig = []            # append effective irrigation
+        irrigEffic = []          # append irrigation efficiency
+        forDate = []
+        FC = []
+        MADg = []
+        waterDeficit = []
+        pwp = []
+        grossIrrg = []
+        rainFall = []
+        ETOs = []
+        ETCs = []
+
+
         inputs = request.data
         fieldsearch = inputs["fieldId"]
         currentField = field.objects.get(id = fieldsearch)
         print("infofromfieldId : ", currentField)
-     
+
+
         lat = float(currentField.Latitude)
         long = float(currentField.Longitude)
         elevation = currentField.Elevation
@@ -110,26 +129,10 @@ class CalculateDroughtAPIView(APIView):
         cropCoeff = {"Early": 0.34257447, "Mid": 1.09349127,
                      "Last Irrig. Event": 0.89713052}
 
-        # _________________________________________
-        # For planting day
-        print("\n\n")
-        plantingDate = currentField.PlantDate
-        print("plantingDate = ", plantingDate)
-
-        # API request_____ from AERISweatherAPI
-        rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
-            plantingDate, lat, long)
-        # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
-
-
-
         # Table Queries___________________________
 
         # ____________________CORP INFO____________________
-        # croptype = cropType.objects.all()
-        # print("croptype : \n", croptype)
         cropTypeSerializerClass = cropTypesSerializer
-
         queryCropType =  cropType.objects.get(id=currentField.CropTypeId.id)
         print("queryCropType = ", queryCropType)
 
@@ -137,49 +140,27 @@ class CalculateDroughtAPIView(APIView):
         maxRootDepthQUERY = queryCropType.MaxRootDepth
         maxAllowableDeplitionQUERY = queryCropType.MaxAllowableDepletion
         dAPforMaxRootDepthQUERY = queryCropType.MaxRootDepthDaysAfterPlanting
-
-        # print("for crops _", currentField.CropTypeId, "_ \n", "length Of Growing Period Days = ", lengthOfGrowingPeriodQUERY, "\n", "maxRootDepthQUERY=", maxRootDepthQUERY, "\n",
-        #       "maxAllowableDeplitionQUERY =", maxAllowableDeplitionQUERY, "\n",
-        #       "dAPforMaxRootDepthQUERY =", dAPforMaxRootDepthQUERY)
         
         # ____________________CORP PERIOD___________________
-        # crop_period = cropPeriod.objects.all()
-        # print("crop_period : \n", crop_period)
         cropPeriodSerializerClass = cropPeriodSerializer
 
         # ____________________SOIL TYPE____________________
-        # soilTypeInfoall = soilType.objects.all()
-        # print("soil type : \n", soilTypeInfoall)
-        soilTypeSerializerClass = soilTypeSerializer
-
-        
+        soilTypeSerializerClass = soilTypeSerializer      
         querySoilType =  soilType.objects.get(id=currentField.SoilTypeId.id)
         print("querySoilType = ", querySoilType)
 
         averagePlantAvailableWaterQUERY = querySoilType.AveragePlantAvailableWater
         permanentWiltingPointQUERY = querySoilType.PermanentWiltingPoint
 
-        # print("for soil type _", currentField.SoilTypeId, "_ \n",
-        #       "averagePlantAvailableWaterQUERY =", averagePlantAvailableWaterQUERY, "\n",
-        #       "permanentWiltingPointQUERY = ", permanentWiltingPointQUERY)
-
 
         # ____________________SOIL DRAINAGE GROUP and HYDROLOGIC GROUP____________________
-
-        # drainageTypeInfo = drainageType.objects.all()
-        # print("drainageTypeInfo  : \n", drainageTypeInfo)
         drainageTypeSerializerClass = drainageTypeSerializer
-
         soildrainageType = drainageType.objects.get(id= currentField.DrainageTypeId.id , HydrologicGroupId = currentField.HydrologicGroupId)
         soildrainageTypeValue = soildrainageType.DrainageValue
-
         print("soildrainageTypeVaule = ", soildrainageTypeValue)
 
         # ____________________SOIL MOISTURE____________________
-        # soil_moisture = soilMoisture.objects.all()
-        # print("soil_moisture  : \n", soil_moisture)
         soilMoistureSerializerClass = soilMoistureSerializer
-
         soilMoistureInfo = soilMoisture.objects.get(
             id=currentField.SoilMoistureId.id)
         
@@ -188,11 +169,56 @@ class CalculateDroughtAPIView(APIView):
 
         # ____________________UNIT CONVERSION____________________
         unit_conversion = unitConversion.objects.all()
-        #print("unit_conversion  : \n", unit_conversion)
         unitConversionSerializerClass = unitConversionSerializer
 
 
         #  Calculations _____________________________
+
+        #__________________________________________
+        # # If fieldname does not exist and not calculated previously
+        print("\n\n")        
+        prevresultcount = results.objects.filter(FieldId=inputs["fieldId"]).count()
+        print("prevresult count = ", prevresultcount)
+
+        if prevresultcount>0:
+            prevresultLast = results.objects.filter(FieldId=inputs["fieldId"]).last()
+            prevresultLastDate = prevresultLast.Date
+            print("prevresultLast = ", prevresultLast)
+            print("prevresultLastDate = ", prevresultLastDate)
+
+        # For planting day
+        print("\n\n")
+        plantingDate = currentField.PlantDate
+        print("plantingDate = ", plantingDate)
+
+        #---
+        # if prevresultcount>0:
+        #     res = results.objects.filter(FieldId=inputs["fieldId"], Date=plantingDate).last()
+        #     print("res SWLs= ", res.WaterLevelStart)
+        #     print("res EWLs= ", res.WaterLevelEnd)
+        #     SWLs.append(res.WaterLevelStart)
+        #     EWLs.append(res.WaterLevelEnd)
+        #     DPs.append(res.DeepPercolation )
+        #     SRs.append(res.SurfaceRunoff)
+        #     VWCs.append(res.VolumetricWaterContent)
+        #     effIrrig.append(res.EffectiveIrrigation)
+        #     irrigEffic.append(res.IrrigationEfficiency)
+        #     forDate.append(res.Date)
+        #     FC.append(res.FieldCapacity)
+        #     MADg.append(res.MaximumAvailableDepletion)
+        #     waterDeficit.append(res.WaterDeficit)
+        #     pwp.append(res.PermanentWiltingPoint)
+        #     grossIrrg.append(res.IrrigationActivityAmount)
+        #     rainFall.append(res.RainObservedAmount)
+        #     ETOs.append(res.EvapotranporationValue)
+        #     ETCs.append(res.EvapotranporationCropValue)
+        # else:    
+        #---
+        # API request_____ from AERISweatherAPI
+        rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
+            plantingDate, lat, long)
+        # print("first---------- ", rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2)
+
 
         planting_date = plantingDate
         print("planting_date = ", planting_date)
@@ -203,10 +229,10 @@ class CalculateDroughtAPIView(APIView):
             seasonLength = lengthOfGrowingPeriodQUERY
 
         date_range = [(planting_date + timedelta(days=i))
-                      for i in range(seasonLength)]
+                    for i in range(seasonLength)]
         days_after_planting = [i for i in range(0, seasonLength)]
 
-   
+
         max_root_depth = maxRootDepthQUERY
         dap = dAPforMaxRootDepthQUERY
 
@@ -235,7 +261,7 @@ class CalculateDroughtAPIView(APIView):
         field_capacity = [round(i*fieldCap, 2) for i in root_depth]
 
         perm_wilt_point = [round(i*permWiltPoint, 2)
-                           for i in root_depth]
+                        for i in root_depth]
         # print("field_capacity = ", field_capacity)
         # print("perm_wilt_point = ", perm_wilt_point)
             
@@ -246,7 +272,7 @@ class CalculateDroughtAPIView(APIView):
         cropPeriodForId = cropPeriod.objects.filter(
             CropTypeId=queryCropType.id).all()    
         print("cropPeriodForId = ", cropPeriodForId)
- 
+
         for item in daps:
             if daps[item] == "":
                 daps[item] = float(cropPeriodForId.filter(
@@ -262,9 +288,9 @@ class CalculateDroughtAPIView(APIView):
         print("cropcoeff = ", cropCoeff)
 
         dev_slope = (cropCoeff['Mid'] - cropCoeff['Early']
-                     )/(daps['Mid'] - daps['Development'])
+                    )/(daps['Mid'] - daps['Development'])
         late_slope = (cropCoeff['Last Irrig. Event'] - cropCoeff['Mid']
-                      )/(daps['Last Irrig. Event'] - daps['Late'])
+                    )/(daps['Last Irrig. Event'] - daps['Late'])
 
         print("dev_slope = ", dev_slope, " ", "late_slope = ", late_slope)
 
@@ -274,7 +300,7 @@ class CalculateDroughtAPIView(APIView):
                 Kc.append(cropCoeff['Early'])
             elif coeff < daps["Mid"]:
                 Kc.append(cropCoeff['Early'] + dev_slope *
-                          (coeff-daps["Development"]))
+                        (coeff-daps["Development"]))
             elif coeff < daps["Late"]:
                 Kc.append(cropCoeff['Mid'])
             elif coeff < daps["Last Irrig. Event"]:
@@ -287,22 +313,7 @@ class CalculateDroughtAPIView(APIView):
 
         ############## _________________________________##############
         # Run the calculation
-        SWLs = []                # append starting water level
-        EWLs = []                # append ending water level
-        DPs = []                 # append deep percolation
-        SRs = []                 # append surface runoff
-        VWCs = []                # append volumetric water content
-        effIrrig = []            # append effective irrigation
-        irrigEffic = []          # append irrigation efficiency
-        forDate = []
-        FC = []
-        MADg = []
-        waterDeficit = []
-        pwp = []
-        grossIrrg = []
-        rainFall = []
-        ETOs = []
-        ETCs = []
+        
 
         #######
         # at planting date, day = 0
@@ -319,7 +330,7 @@ class CalculateDroughtAPIView(APIView):
         # all other values will come from API
         # ET0 = penman_monteith(31.177,21.6,82.2,68,100,54.2,76,16,J0)
         ET0 = penman_monteith(lat, elevation, maxTempF, minTempF,
-                              maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
+                            maxHumidity, minHumidity, solradWM2, windSpeedMPH, J0)
         # penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,wind_speed,J,wind_z=10,Gsc=0.0820,alpha=0.23,G=0):
         print("ET0 on planting day = ", ET0)
 
@@ -341,7 +352,7 @@ class CalculateDroughtAPIView(APIView):
 
         ##############
         swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = plantingDay(ET0, rain, field_capacity[day], ratio, perm_wilt_point[day],
-                                                                   refill_point[day], Kc[day], storage, root_depth[day], gross_irrig_inch)
+                                                                refill_point[day], Kc[day], storage, root_depth[day], gross_irrig_inch)
 
         if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
             (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
@@ -358,26 +369,30 @@ class CalculateDroughtAPIView(APIView):
         ##############
         water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
 
-        plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                  MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN, 
-                                  FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
+        # plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
+        #                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN, 
+        #                         FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
+        
+        plantdayresults = results(Date=plantingDate, WaterLevelStart=round(swl,3), WaterLevelEnd=round(ewl,3), DeepPercolation=round(dp,3), SurfaceRunoff=round(sr,3), VolumetricWaterContent=round(vwc,3), EffectiveIrrigation=round(eff_irrigation,3) if eff_irrigation else eff_irrigation, IrrigationEfficiency=round(irrigation_eff,3) if irrigation_eff else irrigation_eff,
+                            MaximumAvailableDepletion=round(MADforgraph,3), FieldCapacity=round(FC_plantday,3), PermanentWiltingPoint=round(pwp_plantday,3), WaterDeficit=round(water_Deficit,3), IrrigationActivityAmount=round(grossIrrigation,3), RainObservedAmount=round(rainfall_totalIN,3),  
+                            FieldId=currentField, EvapotranporationValue=round(ET0,3), EvapotranporationCropValue = round(crop_et,3))
         plantdayresults.save()
 
-        SWLs.append(swl)
-        EWLs.append(ewl)
-        DPs.append(dp)
-        SRs.append(sr)
-        VWCs.append(vwc)
-        effIrrig.append(eff_irrigation)
-        irrigEffic.append(irrigation_eff)
+        SWLs.append(round(swl,3))
+        EWLs.append(round(ewl,3))
+        DPs.append(round(dp,3))
+        SRs.append(round(sr,3))
+        VWCs.append(round(vwc,3))
+        effIrrig.append(round(eff_irrigation,3) if eff_irrigation else eff_irrigation)
+        irrigEffic.append(round(irrigation_eff,3) if irrigation_eff else irrigation_eff)
         forDate.append(plantingDate.strftime('%m/%d/%Y'))
-        FC.append(FC_plantday)
-        MADg.append(MADforgraph)
-        waterDeficit.append(water_Deficit)
-        pwp.append(pwp_plantday)
-        grossIrrg.append(grossIrrigation)
-        rainFall.append(rainfall_totalIN)
-        ETOs.append(ET0)
+        FC.append(round(FC_plantday,3))
+        MADg.append(round(MADforgraph,3))
+        waterDeficit.append(round(water_Deficit,3))
+        pwp.append(round(pwp_plantday,3))
+        grossIrrg.append(round(grossIrrigation,3))
+        rainFall.append(round(rainfall_totalIN,3))
+        ETOs.append(round(ET0,3))
         ETCs.append(round(crop_et,3))
 
         print("---  here code for loop starts  ---")
@@ -406,6 +421,28 @@ class CalculateDroughtAPIView(APIView):
             NextDayDate = plantingDate + timedelta(days=dayI)
             print("NextDay Date : ", NextDayDate)
 
+            if prevresultcount>0:
+                res = results.objects.filter(FieldId=inputs["fieldId"], Date=NextDayDate).last()
+                if res:
+                    SWLs.append(res.WaterLevelStart)
+                    EWLs.append(res.WaterLevelEnd)
+                    DPs.append(res.DeepPercolation )
+                    SRs.append(res.SurfaceRunoff)
+                    VWCs.append(res.VolumetricWaterContent)
+                    effIrrig.append(res.EffectiveIrrigation)
+                    irrigEffic.append(res.IrrigationEfficiency)
+                    forDate.append(res.Date.strftime('%m/%d/%Y'))
+                    FC.append(res.FieldCapacity)
+                    MADg.append(res.MaximumAvailableDepletion)
+                    waterDeficit.append(res.WaterDeficit)
+                    pwp.append(res.PermanentWiltingPoint)
+                    grossIrrg.append(res.IrrigationActivityAmount)
+                    rainFall.append(res.RainObservedAmount)
+                    ETOs.append(res.EvapotranporationValue)
+                    ETCs.append(res.EvapotranporationCropValue)
+                    continue
+
+
             # API request
             rainfall_totalIN, minTempF, maxTempF, minHumidity, maxHumidity, windSpeedMPH, solradWM2 = api_results(
                 NextDayDate, lat, long)
@@ -416,6 +453,7 @@ class CalculateDroughtAPIView(APIView):
             day = dayI
             rain = rainfall_totalIN  # API
             print("Rain on day ", dayI, " = ", rain)
+
 
             # ET
             J = J0+day
@@ -460,26 +498,26 @@ class CalculateDroughtAPIView(APIView):
 
             water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
 
-            SWLs.append(swl)
-            EWLs.append(ewl)
-            DPs.append(dp)
-            SRs.append(sr)
-            VWCs.append(vwc)
-            effIrrig.append(eff_irrigation)
-            irrigEffic.append(irrigation_eff)
+            SWLs.append(round(swl,3))
+            EWLs.append(round(ewl,3))
+            DPs.append(round(dp,3))
+            SRs.append(round(sr,3))
+            VWCs.append(round(vwc,3))
+            effIrrig.append(round(eff_irrigation,3) if eff_irrigation else eff_irrigation)
+            irrigEffic.append(round(irrigation_eff,3) if irrigation_eff else irrigation_eff)
             forDate.append(NextDayDate.strftime('%m/%d/%Y'))
-            FC.append(FC_growthday)
-            MADg.append(MADforgraph)
-            waterDeficit.append(water_Deficit)
-            pwp.append(pwp_growthday)
-            grossIrrg.append(grossIrrigation)
-            rainFall.append(rainfall_totalIN)
-            ETOs.append(ET0)
+            FC.append(round(FC_growthday,3))
+            MADg.append(round(MADforgraph,3))
+            waterDeficit.append(round(water_Deficit,3))
+            pwp.append(round(pwp_growthday,3))
+            grossIrrg.append(round(grossIrrigation,3))
+            rainFall.append(round(rainfall_totalIN,3))
+            ETOs.append(round(ET0,3))
             ETCs.append(round(crop_et,3))
 
-            growingdaysresults = results(Date=NextDayDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  
-                                         FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
+            growingdaysresults = results(Date=NextDayDate, WaterLevelStart=round(swl,3), WaterLevelEnd=round(ewl,3), DeepPercolation=round(dp,3), SurfaceRunoff=round(sr,3), VolumetricWaterContent=round(vwc,3), EffectiveIrrigation=round(eff_irrigation,3) if eff_irrigation else eff_irrigation, IrrigationEfficiency=round(irrigation_eff,3) if irrigation_eff else irrigation_eff,
+                                         MaximumAvailableDepletion=round(MADforgraph,3), FieldCapacity=round(FC_growthday,3), PermanentWiltingPoint=round(pwp_growthday,3), WaterDeficit=round(water_Deficit,3), IrrigationActivityAmount=round(grossIrrigation,3), RainObservedAmount=round(rainfall_totalIN,3),  
+                                         FieldId=currentField, EvapotranporationValue=round(ET0,3), EvapotranporationCropValue = round(crop_et,3))
             growingdaysresults.save()
 
         print("SWLs : ", SWLs)
