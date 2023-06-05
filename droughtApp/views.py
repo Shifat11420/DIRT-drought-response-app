@@ -185,6 +185,9 @@ class CalculateDroughtAPIView(APIView):
             prevresultLastDate = prevresultLast.Date
             print("prevresultLast = ", prevresultLast)
             print("prevresultLastDate = ", prevresultLastDate)
+            if prevresultLastDate == date.today():
+                print("Calculations till today already exists")
+                
 
         # For planting day
         print("\n\n")
