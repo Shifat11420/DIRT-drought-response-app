@@ -335,7 +335,9 @@ class CalculateDroughtAPIView(APIView):
         print("ET0 on planting day = ", ET0)
 
         # if farmer provides irrigation value for a day
-        grossIrrigation = 0              # farmer override
+        grossIrrigationQuery = irrigation.objects.filter(FieldId = inputs["fieldId"], Date=plantingDate).last()
+        grossIrrigation = grossIrrigationQuery.Amount if grossIrrigationQuery else 0      # farmer override
+        print("grossIrrigation for ",plantingDate, " = ", grossIrrigation)
         grossIrrigUnit = "Acre-inch"     # dropdown if farmer provides a value in grossIrrigation
 
         unitConversionInfo = unit_conversion.filter(
@@ -347,7 +349,7 @@ class CalculateDroughtAPIView(APIView):
 
         gross_irrig_inch = grossIrrigation * grossIrrigFactor
         FC_plantday = field_capacity[day]
-        MADforgraph = maxAllowableDeplitionQUERY * FC_plantday
+        MADforgraph = maxAllowableDeplitionQUERY #* FC_plantday
         pwp_plantday = perm_wilt_point[day]
 
         ##############
@@ -463,7 +465,10 @@ class CalculateDroughtAPIView(APIView):
             print("ET0 : ", ET0)
 
             # if farmer provides irrigation value for a day
-            grossIrrigation = 0               # farmer override
+            grossIrrigationQuery = irrigation.objects.filter(FieldId = inputs["fieldId"], Date=NextDayDate).last()
+            print("grossIrrigation query = ", grossIrrigationQuery)
+            grossIrrigation = grossIrrigationQuery.Amount if grossIrrigationQuery else 0      # farmer override
+            print("grossIrrigation for", NextDayDate, " = ", grossIrrigation)
             grossIrrigUnit = "Acre-inch"      # dropdown if farmer provides a value in grossIrrigation
 
             unitConversionInfo = unit_conversion.filter(
@@ -475,7 +480,7 @@ class CalculateDroughtAPIView(APIView):
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
             FC_growthday = field_capacity[day]
-            MADforgraph = maxAllowableDeplitionQUERY * FC_growthday
+            MADforgraph = maxAllowableDeplitionQUERY #* FC_growthday
             pwp_growthday = perm_wilt_point[day]
 
             #########
