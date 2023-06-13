@@ -343,9 +343,9 @@ class CalculateDroughtAPIView(APIView):
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
-            FC_plantday = field_capacity[day]
-            MADforgraph = maxAllowableDeplitionQUERY #* FC_plantday
+            FC_plantday = field_capacity[day]  
             pwp_plantday = perm_wilt_point[day]
+            MADforgraph = (FC_plantday-pwp_plantday)*maxAllowableDeplitionQUERY+pwp_plantday #maxAllowableDeplitionQUERY #* FC_plantday
 
             ##############
             swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = plantingDay(ET0, rain, field_capacity[day], ratio, perm_wilt_point[day],
@@ -471,8 +471,8 @@ class CalculateDroughtAPIView(APIView):
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
             FC_growthday = field_capacity[day]
-            MADforgraph = maxAllowableDeplitionQUERY #* FC_growthday
             pwp_growthday = perm_wilt_point[day]
+            MADforgraph = (FC_growthday-pwp_growthday)*maxAllowableDeplitionQUERY+pwp_growthday #maxAllowableDeplitionQUERY #* FC_growthday
 
             #########
             swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], fieldCap,
