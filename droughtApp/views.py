@@ -8,6 +8,7 @@ from rest_framework.renderers import JSONRenderer
 from .models import *
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from django.http import JsonResponse
 
 from django.shortcuts import get_object_or_404
@@ -81,8 +82,9 @@ class irrigationActivity(viewsets.ModelViewSet):
 class resultViewSet(viewsets.ModelViewSet):
     queryset = results.objects.all()
     serializer_class = resultSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['FieldId']
+    ordering_fields = ['Date']
 
     @action(detail=True, methods=['delete'])
     def deleteforfield(self, request, pk=None):
