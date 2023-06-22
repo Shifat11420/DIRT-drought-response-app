@@ -478,7 +478,7 @@ class CalculateDroughtAPIView(APIView):
 
             #########
             swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], fieldCap,
-                                                                     refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
+                                                                     refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch)
 
             if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
                 (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
