@@ -372,7 +372,7 @@ class CalculateDroughtAPIView(APIView):
                 flowMeterReadings=grossIrrigUnit).values()
             for q in unitConversionInfo:
                 conversionQUERY = q['conversion']
-            grossIrrigFactor = conversionQUERY
+            grossIrrigFactor = conversionQUERY/currentField.Acreage
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
@@ -398,6 +398,7 @@ class CalculateDroughtAPIView(APIView):
                 irrigation_eff = None  
             ##############
             water_Deficit = 100 * (FC_plantday-ewl)/FC_plantday
+            
             
             plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
                                 MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  
@@ -499,7 +500,7 @@ class CalculateDroughtAPIView(APIView):
                 flowMeterReadings=grossIrrigUnit).values()
             for q in unitConversionInfo:
                 conversionQUERY = q['conversion']
-            grossIrrigFactor = conversionQUERY
+            grossIrrigFactor = conversionQUERY/currentField.Acreage
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
@@ -507,9 +508,11 @@ class CalculateDroughtAPIView(APIView):
             pwp_growthday = perm_wilt_point[day]
             MADforgraph = (FC_growthday-pwp_growthday)*(maxAllowableDeplitionQUERY/100)+pwp_growthday #maxAllowableDeplitionQUERY #* FC_growthday
 
+
+            print("EWLs[day-1]", "for ", day-1, "is ", EWLs[day-1])
             #########
             swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], fieldCap,
-                                                                     refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch=0)
+                                                                     refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch)
 
             if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
                 (day >= daps['Last Irrig. Event'] and swl-crop_et+eff_rainfall < 1.25*perm_wilt_point[day]) or
@@ -526,6 +529,8 @@ class CalculateDroughtAPIView(APIView):
             ###############
 
             water_Deficit = 100 * (FC_growthday-ewl)/FC_growthday
+            if water_Deficit<0:
+                water_Deficit=0
 
             SWLs.append(swl)
             EWLs.append(ewl)
