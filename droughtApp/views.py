@@ -368,11 +368,11 @@ class CalculateDroughtAPIView(APIView):
             print("grossIrrigation for ",plantingDate, " = ", grossIrrigation)
             grossIrrigUnit = "Acre-inch"     # dropdown if farmer provides a value in grossIrrigation
 
-            unitConversionInfo = unit_conversion.filter(
-                flowMeterReadings=grossIrrigUnit).values()
-            for q in unitConversionInfo:
-                conversionQUERY = q['conversion']
-            grossIrrigFactor = conversionQUERY/currentField.Acreage
+            # unitConversionInfo = unit_conversion.filter(
+            #     flowMeterReadings=grossIrrigUnit).values()
+            # for q in unitConversionInfo:
+            #     conversionQUERY = q['conversion']
+            grossIrrigFactor = 1 #conversionQUERY/currentField.Acreage
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
@@ -381,7 +381,7 @@ class CalculateDroughtAPIView(APIView):
             MADforgraph = (FC_plantday-pwp_plantday)*(maxAllowableDeplitionQUERY/100)+pwp_plantday #maxAllowableDeplitionQUERY #* FC_plantday
 
             ##############
-            swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = plantingDay(ET0, rain, field_capacity[day], ratio, perm_wilt_point[day],
+            swl, crop_et, eff_rainfall, sr,  ewl, vwc = plantingDay(ET0, rain, field_capacity[day], ratio, perm_wilt_point[day],
                                                                     refill_point[day], Kc[day], storage, root_depth[day], gross_irrig_inch)
 
             if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
@@ -392,6 +392,11 @@ class CalculateDroughtAPIView(APIView):
             else:
                 eff_irrigation = 0
 
+            if gross_irrig_inch>0 and eff_irrigation>0 and gross_irrig_inch>eff_irrigation:
+                dp = gross_irrig_inch - eff_irrigation
+            else:
+                dp = 0    
+
             if gross_irrig_inch > 0:
                 irrigation_eff = eff_irrigation/gross_irrig_inch
             else:
@@ -401,7 +406,7 @@ class CalculateDroughtAPIView(APIView):
             
             
             plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  
+                                MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=gross_irrig_inch, RainObservedAmount=rainfall_totalIN,  
                                 FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
             plantdayresults.save()
 
@@ -417,7 +422,8 @@ class CalculateDroughtAPIView(APIView):
             MADg.append(MADforgraph)
             waterDeficit.append(water_Deficit)
             pwp.append(pwp_plantday)
-            grossIrrg.append(grossIrrigation)
+            # grossIrrg.append(grossIrrigation) gross_irrig_inch
+            grossIrrg.append(gross_irrig_inch)
             rainFall.append(rainfall_totalIN)
             ETOs.append(ET0)
             ETCs.append(crop_et)
@@ -496,11 +502,11 @@ class CalculateDroughtAPIView(APIView):
             print("grossIrrigation for", NextDayDate, " = ", grossIrrigation)
             grossIrrigUnit = "Acre-inch"      # dropdown if farmer provides a value in grossIrrigation
 
-            unitConversionInfo = unit_conversion.filter(
-                flowMeterReadings=grossIrrigUnit).values()
-            for q in unitConversionInfo:
-                conversionQUERY = q['conversion']
-            grossIrrigFactor = conversionQUERY/currentField.Acreage
+            # unitConversionInfo = unit_conversion.filter(
+            #     flowMeterReadings=grossIrrigUnit).values()
+            # for q in unitConversionInfo:
+            #     conversionQUERY = q['conversion']
+            grossIrrigFactor = 1 #conversionQUERY/currentField.Acreage
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
@@ -511,7 +517,7 @@ class CalculateDroughtAPIView(APIView):
 
             print("EWLs[day-1]", "for ", day-1, "is ", EWLs[day-1])
             #########
-            swl, crop_et, eff_rainfall, sr, dp, ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], fieldCap,
+            swl, crop_et, eff_rainfall, sr,  ewl, vwc = growthDay(ET0, rain, EWLs[day-1], root_depth[day-1], root_depth[day], field_capacity[day], fieldCap,
                                                                      refill_point[day], perm_wilt_point[day], Kc[day], storage, gross_irrig_inch)
 
             if (((swl-crop_et+eff_rainfall < refill_point[day] and day >= daps['Development'] and day < daps['Last Irrig. Event']) or
@@ -521,6 +527,11 @@ class CalculateDroughtAPIView(APIView):
                 eff_irrigation = field_capacity[day] - swl
             else:
                 eff_irrigation = 0
+
+            if gross_irrig_inch>0 and eff_irrigation>0 and gross_irrig_inch>eff_irrigation:
+                dp = gross_irrig_inch - eff_irrigation
+            else:
+                dp = 0    
 
             if gross_irrig_inch > 0:
                 irrigation_eff = eff_irrigation/gross_irrig_inch
@@ -544,13 +555,14 @@ class CalculateDroughtAPIView(APIView):
             MADg.append(MADforgraph)
             waterDeficit.append(water_Deficit)
             pwp.append(pwp_growthday)
-            grossIrrg.append(grossIrrigation)
+            # grossIrrg.append(grossIrrigation)
+            grossIrrg.append(gross_irrig_inch)
             rainFall.append(rainfall_totalIN)
             ETOs.append(ET0)
             ETCs.append(crop_et)
 
             growingdaysresults = results(Date=NextDayDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
-                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=grossIrrigation, RainObservedAmount=rainfall_totalIN,  
+                                         MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=gross_irrig_inch, RainObservedAmount=rainfall_totalIN,  
                                          FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
             growingdaysresults.save()
 
@@ -570,6 +582,8 @@ class CalculateDroughtAPIView(APIView):
         print("rain fall in inches : ", rainFall)
         print("EvapotranporationValue : ", ETOs)
         print("EvapotranporationCropValue : ", ETCs)
+        print("****            ")
+        print("storage =", storage)
 
         resultsDict = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
                        "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall, 

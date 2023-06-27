@@ -75,10 +75,10 @@ def plantingDay(ET0,rain,fc,ratio,pwp,rp,Kc,storage,root_depth,gross_irrig_inch=
     else:
         sr = ((rain-0.2*storage)**2/(rain+0.8*storage))
     
-    if swl-crop_et+rain+gross_irrig_inch>fc:
-        dp = swl-crop_et+rain+gross_irrig_inch-fc
-    else:
-        dp = 0
+    # if swl-crop_et+rain+gross_irrig_inch>fc:
+    #     dp = swl-crop_et+rain+gross_irrig_inch-fc
+    # else:
+    #     dp = 0
         
     if swl-crop_et+rain-sr>fc:
         eff_rainfall = fc - swl
@@ -92,9 +92,9 @@ def plantingDay(ET0,rain,fc,ratio,pwp,rp,Kc,storage,root_depth,gross_irrig_inch=
     
     vwc = ewl/root_depth
 
-    return (swl,crop_et,eff_rainfall, sr, dp,ewl,vwc)
+    return (swl,crop_et,eff_rainfall, sr, ewl,vwc)
 
-def growthDay(ET0,rain,ewl0,root_depth0,root_depth,fc,field_cap,rp,pwp,Kc,storage,gross_irrig_inch=0):  
+def growthDay(ET0,rain,ewl0,root_depth0,root_depth,fc,field_cap,rp,pwp,Kc,storage,gross_irrig_inch):  
     
     if ewl0>fc:
         swl = fc
@@ -116,10 +116,11 @@ def growthDay(ET0,rain,ewl0,root_depth0,root_depth,fc,field_cap,rp,pwp,Kc,storag
     else:
         sr = ((rain-0.2*storage)**2/(rain+0.8*storage))
 
-    if swl-crop_et+rain+gross_irrig_inch>fc:
-        dp = swl-crop_et+rain+gross_irrig_inch-fc
-    else:
-        dp = 0
+    # if swl-crop_et+rain+gross_irrig_inch>fc:
+    #     dp = swl-crop_et+rain+gross_irrig_inch-fc
+    # else:
+    #     dp = 0
+    
 
     if swl-crop_et+rain-sr>fc:
         eff_rainfall = fc - swl
@@ -133,6 +134,6 @@ def growthDay(ET0,rain,ewl0,root_depth0,root_depth,fc,field_cap,rp,pwp,Kc,storag
     
     vwc = ewl/root_depth
      
-    return (swl,crop_et,eff_rainfall, sr, dp,ewl,vwc)
+    return (swl,crop_et,eff_rainfall, sr,ewl,vwc)
     
   
