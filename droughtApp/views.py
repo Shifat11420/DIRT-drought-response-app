@@ -145,6 +145,7 @@ class CalculateDroughtAPIView(APIView):
         rainFall = []
         ETOs = []
         ETCs = []
+        EffRainfall = []
 
 
         inputs = request.data
@@ -260,7 +261,7 @@ class CalculateDroughtAPIView(APIView):
                 root_depth.append(1.0)
             elif no_days < dap:
                 root_depth.append(
-                    round((root_depth[no_days-1]+((max_root_depth-1)/dap)), 2))
+                    (root_depth[no_days-1]+((max_root_depth-1)/dap)))
             else:
                 root_depth.append(max_root_depth)
 
@@ -276,15 +277,15 @@ class CalculateDroughtAPIView(APIView):
         else:    
             fieldCap = permWiltPoint + averagePlantAvailableWaterQUERY
 
-        field_capacity = [round(i*fieldCap, 2) for i in root_depth]
+        field_capacity = [i*fieldCap for i in root_depth]
 
-        perm_wilt_point = [round(i*permWiltPoint, 2)
+        perm_wilt_point = [i*permWiltPoint
                         for i in root_depth]
         # print("field_capacity = ", field_capacity)
         # print("perm_wilt_point = ", perm_wilt_point)
             
         maxAllowDepl = maxAllowableDeplitionQUERY    
-        refill_point = [round(i-(maxAllowDepl/100)*(i-j), 2)
+        refill_point = [i-(maxAllowDepl/100)*(i-j)
                         for i, j in zip(field_capacity, perm_wilt_point)]
 
         cropPeriodForId = cropPeriod.objects.filter(
@@ -328,6 +329,7 @@ class CalculateDroughtAPIView(APIView):
 
         storage = (1000/soildrainageTypeValue) - 10
         print("storage =", storage)
+        print(" Kc = ", Kc)
 
         if prevresultcount>0:
             # retrieve previously calculated result from database_____________
@@ -346,6 +348,7 @@ class CalculateDroughtAPIView(APIView):
             pwp.append(res.PermanentWiltingPoint)
             grossIrrg.append(res.IrrigationActivityAmount)
             rainFall.append(res.RainObservedAmount)
+            EffRainfall.append(res.EffectiveRainAmount)
             ETOs.append(res.EvapotranporationValue)
             ETCs.append(res.EvapotranporationCropValue)
         else: 
@@ -407,6 +410,7 @@ class CalculateDroughtAPIView(APIView):
             
             plantdayresults = results(Date=plantingDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
                                 MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_plantday, PermanentWiltingPoint=pwp_plantday, WaterDeficit=water_Deficit, IrrigationActivityAmount=gross_irrig_inch, RainObservedAmount=rainfall_totalIN,  
+                                EffectiveRainAmount = eff_rainfall,
                                 FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
             plantdayresults.save()
 
@@ -422,11 +426,12 @@ class CalculateDroughtAPIView(APIView):
             MADg.append(MADforgraph)
             waterDeficit.append(water_Deficit)
             pwp.append(pwp_plantday)
-            # grossIrrg.append(grossIrrigation) gross_irrig_inch
+            # grossIrrg.append(grossIrrigation)
             grossIrrg.append(gross_irrig_inch)
             rainFall.append(rainfall_totalIN)
             ETOs.append(ET0)
             ETCs.append(crop_et)
+            EffRainfall.append(eff_rainfall)
 
         print("---  here code for loop starts  ---")
         print("\n\n")
@@ -471,8 +476,9 @@ class CalculateDroughtAPIView(APIView):
                     pwp.append(res.PermanentWiltingPoint)
                     grossIrrg.append(res.IrrigationActivityAmount)
                     rainFall.append(res.RainObservedAmount)
+                    EffRainfall.append(res.EffectiveRainAmount)
                     ETOs.append(res.EvapotranporationValue)
-                    ETCs.append(res.EvapotranporationCropValue)
+                    ETCs.append(res.EvapotranporationCropValue)                   
                     continue
 
 
@@ -560,9 +566,11 @@ class CalculateDroughtAPIView(APIView):
             rainFall.append(rainfall_totalIN)
             ETOs.append(ET0)
             ETCs.append(crop_et)
+            EffRainfall.append(eff_rainfall)
 
             growingdaysresults = results(Date=NextDayDate, WaterLevelStart=swl, WaterLevelEnd=ewl, DeepPercolation=dp, SurfaceRunoff=sr, VolumetricWaterContent=vwc, EffectiveIrrigation=eff_irrigation, IrrigationEfficiency=irrigation_eff,
                                          MaximumAvailableDepletion=MADforgraph, FieldCapacity=FC_growthday, PermanentWiltingPoint=pwp_growthday, WaterDeficit=water_Deficit, IrrigationActivityAmount=gross_irrig_inch, RainObservedAmount=rainfall_totalIN,  
+                                         EffectiveRainAmount = eff_rainfall,
                                          FieldId=currentField, EvapotranporationValue=ET0, EvapotranporationCropValue = crop_et)
             growingdaysresults.save()
 
@@ -582,10 +590,12 @@ class CalculateDroughtAPIView(APIView):
         print("rain fall in inches : ", rainFall)
         print("EvapotranporationValue : ", ETOs)
         print("EvapotranporationCropValue : ", ETCs)
+        print("EffRainfall : ", EffRainfall)
         print("****            ")
         print("storage =", storage)
+        print(" Kc = ", Kc)
 
         resultsDict = {'SWLs': SWLs, 'EWLs': EWLs, 'DPs': DPs, 'SRs': SRs, 'VWCs': VWCs, 'effIrrig': effIrrig, 'irrigEffic': irrigEffic, 'forDate': forDate,
                        "MAD": MADg, "FC": FC, "PWP": pwp, "Deficit(%)": waterDeficit, "irrigation activity": grossIrrg, "rain observed": rainFall, 
-                       'EvapotranporationValue': ETOs, 'EvapotranporationCropValue' : ETCs}
+                       'EvapotranporationValue': ETOs, 'EvapotranporationCropValue' : ETCs,  'EffectiveRainfall' : EffRainfall}
         return Response({'results': resultsDict})

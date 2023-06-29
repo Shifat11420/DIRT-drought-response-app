@@ -59,7 +59,7 @@ def penman_monteith(station_lat, station_z, Tmax_F,Tmin_F,Rhmax,Rhmin,avg_RS,win
     
     term1= 0.408 * slope * (Rn-G)/(slope + y * (1+0.34*u2))
     term2= y *(900/(Tmean+273.15)) * u2 * (es-ea) / (slope + y * (1+0.34*u2))
-    return round((term1+term2)/25.4,2)
+    return (term1+term2)/25.4
 
 def plantingDay(ET0,rain,fc,ratio,pwp,rp,Kc,storage,root_depth,gross_irrig_inch=0):
     swl = fc - ratio * (fc - pwp)

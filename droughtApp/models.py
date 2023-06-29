@@ -133,6 +133,7 @@ class results(models.Model):
     WaterDeficit = models.FloatField(null=True)
     IrrigationActivityAmount = models.FloatField(null=True)
     RainObservedAmount = models.FloatField(null=True)
+    EffectiveRainAmount = models.FloatField(null=True)
     EvapotranporationValue = models.FloatField(null=True)
     EvapotranporationCropValue = models.FloatField(null=True)
 
