@@ -68,7 +68,7 @@ def plantingDay(ET0,rain,fc,ratio,pwp,rp,Kc,storage,root_depth,gross_irrig_inch=
     else:
         Ks = (swl - pwp)/(rp-pwp)
 
-    crop_et = ET0 * Kc  #* Ks
+    crop_et = ET0 * Kc  * Ks
     
     if rain < 0.1:
         sr = rain
@@ -109,7 +109,7 @@ def growthDay(ET0,rain,ewl0,root_depth0,root_depth,fc,field_cap,rp,pwp,Kc,storag
     else:
         Ks = (swl - pwp)/(rp-pwp)
     
-    crop_et = ET0 * Kc #* Ks
+    crop_et = ET0 * Kc * Ks
     
     if rain < 0.1:
         sr = rain

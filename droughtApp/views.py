@@ -160,8 +160,10 @@ class CalculateDroughtAPIView(APIView):
 
         daps = {"Early": "", "Development": "", "Mid": "",
                 "Late": "", "Last Irrig. Event": ""}
-        cropCoeff = {"Early": 0.34257447, "Mid": 1.09349127,
-                     "Last Irrig. Event": 0.89713052}
+        # cropCoeff = {"Early": 0.34257447, "Mid": 1.09349127,
+        #              "Last Irrig. Event": 0.89713052}
+        cropCoeff = {"Early": "", "Mid": "",
+                     "Last Irrig. Event": ""}
 
         # Table Queries___________________________
 
