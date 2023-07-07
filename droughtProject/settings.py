@@ -94,33 +94,33 @@ WSGI_APPLICATION = 'droughtProject.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'mssql',
-#         'NAME': 'DIRT',
-#         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
-#         'PORT': '1433',
-#         'OPTIONS': {
-#                 'driver': 'ODBC Driver 17 for SQL Server',
-#                 'extra_params': 'Authentication=ActiveDirectoryMsi',
-#         },
-#     },
-# }
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'DIRT',
         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
-        'USER': 'svc_droughtresponse_api',
-        'PASSWORD': 'HgTYrf!43Rabba',
-        'PORT': '',
+        'PORT': '1433',
         'OPTIONS': {
-                'driver': 'ODBC Driver 18 for SQL Server',
+                'driver': 'ODBC Driver 17 for SQL Server',
+                'extra_params': 'Authentication=ActiveDirectoryMsi',
         },
     },
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'mssql',
+#         'NAME': 'DIRT',
+#         'HOST': 'sql-apps-dev-ussc-01.database.windows.net',
+#         'USER': 'svc_droughtresponse_api',
+#         'PASSWORD': 'HgTYrf!43Rabba',
+#         'PORT': '',
+#         'OPTIONS': {
+#                 'driver': 'ODBC Driver 18 for SQL Server',
+#         },
+#     },
+# }
 
 
 # set this to False if you want to turn off pyodbc's connection pooling
