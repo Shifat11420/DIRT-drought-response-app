@@ -98,7 +98,7 @@ class field(models.Model):
 
 
 class irrigation(models.Model):
-    FieldId = models.ForeignKey(field, on_delete=models.PROTECT)
+    FieldId = models.ForeignKey(field, on_delete=models.CASCADE)
     Date = models.DateField()
     Amount = models.FloatField()
 
@@ -118,7 +118,7 @@ class unitConversion(models.Model):
 
 class results(models.Model):
     FieldId = models.ForeignKey(
-        field, on_delete=models.PROTECT, null=True)
+        field, on_delete=models.CASCADE, null=True)
     Date = models.DateField(blank=True, default=date(1111, 11, 11), null=True)
     WaterLevelStart = models.FloatField(null=True)
     WaterLevelEnd = models.FloatField(null=True)
