@@ -52,11 +52,14 @@ class SoilTypes(viewsets.ReadOnlyModelViewSet):
     queryset = soilType.objects.all().order_by('Name')
     serializer_class = soilTypeSerializer
 
-
 class hydrologicGroups(viewsets.ReadOnlyModelViewSet):
     queryset = hydrologicGroup.objects.all()
     serializer_class = hydrologicGroupSerializer
 
+
+class unitConversionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = unitConversion.objects.all().order_by('Name')
+    serializer_class = unitConversionSerializer
 
 class HelloView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -371,13 +374,27 @@ class CalculateDroughtAPIView(APIView):
             grossIrrigationQuery = irrigation.objects.filter(FieldId = inputs["fieldId"], Date=plantingDate).last()
             grossIrrigation = grossIrrigationQuery.Amount if grossIrrigationQuery else 0      # farmer override
             print("grossIrrigation for ",plantingDate, " = ", grossIrrigation)
-            grossIrrigUnit = "Acre-inch"     # dropdown if farmer provides a value in grossIrrigation
+            grossIrrigUnit = grossIrrigationQuery.UnitId if grossIrrigationQuery else "None" # "Acre-inch"     # dropdown if farmer provides a value in grossIrrigation
+            print("grossIrrigUnit = ", grossIrrigUnit)
 
-            # unitConversionInfo = unit_conversion.filter(
-            #     flowMeterReadings=grossIrrigUnit).values()
-            # for q in unitConversionInfo:
-            #     conversionQUERY = q['conversion']
-            grossIrrigFactor = 1 #conversionQUERY/currentField.Acreage
+            if grossIrrigationQuery:
+                unitConversionInfo = unit_conversion.filter(
+                    Name=str(grossIrrigUnit)).values()
+                for q in unitConversionInfo:
+                    conversionQUERY = q['conversion']
+                print("conversionQUERY = ", conversionQUERY)
+
+
+            if str(grossIrrigUnit) == "Inch":
+                grossIrrigFactor = conversionQUERY
+            elif str(grossIrrigUnit) == "Acre-inch":
+                grossIrrigFactor = conversionQUERY/currentField.Acreage  
+            elif str(grossIrrigUnit) == "Gallons":
+                grossIrrigFactor = conversionQUERY   
+            elif str(grossIrrigUnit) == "Kilogallons":
+                grossIrrigFactor = conversionQUERY
+            else:
+                grossIrrigFactor = 1 
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor
@@ -482,6 +499,7 @@ class CalculateDroughtAPIView(APIView):
                     ETOs.append(res.EvapotranporationValue)
                     ETCs.append(res.EvapotranporationCropValue)                   
                     continue
+                
 
 
             # API request
@@ -508,13 +526,27 @@ class CalculateDroughtAPIView(APIView):
             print("grossIrrigation query = ", grossIrrigationQuery)
             grossIrrigation = grossIrrigationQuery.Amount if grossIrrigationQuery else 0      # farmer override
             print("grossIrrigation for", NextDayDate, " = ", grossIrrigation)
-            grossIrrigUnit = "Acre-inch"      # dropdown if farmer provides a value in grossIrrigation
+            grossIrrigUnit = grossIrrigationQuery.UnitId if grossIrrigationQuery else "None" # "Acre-inch"     # dropdown if farmer provides a value in grossIrrigation
+            print("grossIrrigUnit = ", grossIrrigUnit)
 
-            # unitConversionInfo = unit_conversion.filter(
-            #     flowMeterReadings=grossIrrigUnit).values()
-            # for q in unitConversionInfo:
-            #     conversionQUERY = q['conversion']
-            grossIrrigFactor = 1 #conversionQUERY/currentField.Acreage
+            if grossIrrigationQuery:
+                unitConversionInfo = unit_conversion.filter(
+                    Name=str(grossIrrigUnit)).values()
+                for q in unitConversionInfo:
+                    conversionQUERY = q['conversion']
+                print("conversionQUERY = ", conversionQUERY)
+
+            if str(grossIrrigUnit) == "Inch":
+                grossIrrigFactor = conversionQUERY
+            elif str(grossIrrigUnit) == "Acre-inch":
+                grossIrrigFactor = conversionQUERY/currentField.Acreage  
+            elif str(grossIrrigUnit) == "Gallons":
+                grossIrrigFactor = conversionQUERY   
+            elif str(grossIrrigUnit) == "Kilogallons":
+                grossIrrigFactor = conversionQUERY
+            else:
+                grossIrrigFactor = 1 
+
             print("grossIrrigFactor = ", grossIrrigFactor)
 
             gross_irrig_inch = grossIrrigation * grossIrrigFactor

@@ -13,6 +13,7 @@ router.register(r'soiltype', views.SoilTypes)
 router.register(r'hydrologicgroup', views.hydrologicGroups)
 router.register(r'drainageType', views.drainageTypeViewSet)
 router.register(r'soilMoisture', views.soilMoistureViewSet)
+router.register(r'unitConversion', views.unitConversionViewSet)
 router.register(r'result', views.resultViewSet)
 
 

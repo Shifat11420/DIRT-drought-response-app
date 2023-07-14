@@ -96,24 +96,23 @@ class field(models.Model):
     def __str__(self):
         return self.Name
 
-
-class irrigation(models.Model):
-    FieldId = models.ForeignKey(field, on_delete=models.CASCADE)
-    Date = models.DateField()
-    Amount = models.FloatField()
-
-    def __str__(self):
-        return str(self.FieldId)+str(self.Date)
-
-
 class unitConversion(models.Model):
-    flowMeterReadings = models.CharField(max_length=30)
-    indicator = models.IntegerField()
+    Name = models.CharField(max_length=30)
     units = models.CharField(max_length=30)
     conversion = models.FloatField()
 
     def __str__(self):
-        return self.flowMeterReadings
+        return self.Name
+
+
+class irrigation(models.Model):
+    FieldId = models.ForeignKey(field, on_delete=models.CASCADE, null=True)
+    UnitId = models.ForeignKey(unitConversion, on_delete=models.CASCADE, null=True, default=7)
+    Date = models.DateField(null=True)
+    Amount = models.FloatField(null=True)
+
+    def __str__(self):
+        return str(self.FieldId)+str(self.Date)
 
 
 class results(models.Model):
