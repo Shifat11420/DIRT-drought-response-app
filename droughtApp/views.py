@@ -390,9 +390,9 @@ class CalculateDroughtAPIView(APIView):
             elif str(grossIrrigUnit) == "Acre-inch":
                 grossIrrigFactor = conversionQUERY/currentField.Acreage  
             elif str(grossIrrigUnit) == "Gallons":
-                grossIrrigFactor = conversionQUERY   
+                grossIrrigFactor = conversionQUERY/currentField.Acreage     
             elif str(grossIrrigUnit) == "Kilogallons":
-                grossIrrigFactor = conversionQUERY
+                grossIrrigFactor = conversionQUERY/currentField.Acreage  
             else:
                 grossIrrigFactor = 1 
             print("grossIrrigFactor = ", grossIrrigFactor)
@@ -541,9 +541,9 @@ class CalculateDroughtAPIView(APIView):
             elif str(grossIrrigUnit) == "Acre-inch":
                 grossIrrigFactor = conversionQUERY/currentField.Acreage  
             elif str(grossIrrigUnit) == "Gallons":
-                grossIrrigFactor = conversionQUERY   
+                grossIrrigFactor = conversionQUERY/currentField.Acreage     
             elif str(grossIrrigUnit) == "Kilogallons":
-                grossIrrigFactor = conversionQUERY
+                grossIrrigFactor = conversionQUERY/currentField.Acreage  
             else:
                 grossIrrigFactor = 1 
 
